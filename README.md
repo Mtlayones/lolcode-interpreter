@@ -5,7 +5,7 @@
 ### Framework: 
 - ReactJS
   
-## Tasks:
+### Tasks:
 1. [ ] **GUI**
 2. [ ] **Symbol Table**
 3. [ ] **Syntax Analyzer**
