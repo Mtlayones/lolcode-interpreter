@@ -6,7 +6,8 @@
 - ReactJS
   
 ## Tasks:
-[ ] **GUI**
-[ ] **Symbol Table**
-[ ] **Syntax Analyzer**
-[ ] **Semantics Analyzer**
+  
+1. [ ] **GUI**
+2. [ ] **Symbol Table**
+3. [ ] **Syntax Analyzer**
+4. [ ] **Semantics Analyzer**
