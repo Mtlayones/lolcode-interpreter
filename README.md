@@ -11,3 +11,7 @@
 2. [ ] **Symbol Table**
 3. [ ] **Syntax Analyzer**
 4. [ ] **Semantics Analyzer**
+  
+ 
+Link for Project Specification:
+[1]: https://drive.google.com/file/d/1ooCMhXHBoz_SRve0uTH5VF4Y94habUld/view
