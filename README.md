@@ -1,1 +1,1 @@
-# LOLCODE_Project
+# LOLCode Project for CMSC 124
