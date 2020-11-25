@@ -13,5 +13,5 @@
 4. [ ] **Semantics Analyzer**
   
  
-**Link for Project Specification:**
-[link text](https://drive.google.com/file/d/1ooCMhXHBoz_SRve0uTH5VF4Y94habUld/view)
+**Link for Project Specification:**  
+[CMSC 124 Project Specification](https://drive.google.com/file/d/1ooCMhXHBoz_SRve0uTH5VF4Y94habUld/view)
