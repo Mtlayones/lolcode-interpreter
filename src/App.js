@@ -1,23 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
+import React, {useState} from 'react'
+import FirstFrame from './gui components/firstFrame';
 
 function App() {
+  const [lolCodeData,setLolCodeData] = useState({})
+  console.log(lolCodeData)
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className = "mainWrapper">
+
+        <div className = "firstRow">
+            <FirstFrame></FirstFrame>
+            
+          <div className = "secondFrame">
+            UWU2
+          </div>
+
+        </div>
+        <div className="secondRow">
+          <div className="thirdFrame">
+            UWU3
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
