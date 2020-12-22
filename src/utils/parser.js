@@ -383,12 +383,12 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
         }
-        if(["ANY OF","AN"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        if(["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             //operands
             error = operands_abs(code,tableOfLexemes,lineNumber, false);
             // check if error
             if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber] = error;
+            [code,tableOfLexemes, lineNumber] = error;
             cnt ++;
         }else if(code[0][0] == "AN"){
             placeholder = code[0].shift();
@@ -642,7 +642,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
 
 // loop abstraction
 const loop_abs = (code, tableOfLexemes, lineNumber) => {
-    let placeholder = code[0].shift(),error,cnt = 0,end=false;
+    let placeholder = code[0].shift(),error,end=false;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
@@ -651,6 +651,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
     }
+    // for the name of the loop with the YR before
     if(code[0][0] == "YR"){
         placeholder = code[0].shift();
         tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -666,6 +667,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
         }
+        // increment or decrement with the UPPIN and the NERFIN
         if(code[0][0] == "UPPIN" | code[0][0] == "NERFIN"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -676,6 +678,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                 // if there is exceeding whitespace in between the operation
                 return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
             }
+            // variable to be incremented with YR before
             if(code[0][0] == "YR"){
                 placeholder = code[0].shift();
                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -684,6 +687,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                 // check if error
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
+                // the conditionals in the loop
                 if(code[0][0] == "TIL" | code[0][0] == "WILE"){
                     placeholder = code[0].shift();
                     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -694,11 +698,13 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                         // if there is exceeding whitespace in between the operation
                         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
                     }
+                    // the condition
                     //operands
                     error = operands_abs(code,tableOfLexemes,lineNumber, true);
                     // check if error
                     if(!Array.isArray(error)) return error;
                     [code,tableOfLexemes, lineNumber] = error;
+                    // body of the loop
                     while(!end){
                         if(code.length == 0){
                             return `Syntax Error in line ${lineNumber-1}: Expected End of the Loop.`;
@@ -716,6 +722,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                             }
                             continue;
                         }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IM OUTTA"){
+                            // loop code delimiter
                             placeholder = [code[0].shift(),code[0].shift()].join(' ');
                             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
                             if(code[0].length == 0){
@@ -725,6 +732,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                                 // if there is exceeding whitespace in between the operation
                                 return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
                             }
+                            // name of the loop after the YR
                             if(code[0][0] == "YR"){
                                 placeholder = code[0].shift();
                                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -745,6 +753,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                             }
                             end = true
                         }else{
+                            // body of the loop
                             error = statement_abs(code,tableOfLexemes,lineNumber);
                             if(!Array.isArray(error)) return error;
                             [code,tableOfLexemes, lineNumber] = error;
