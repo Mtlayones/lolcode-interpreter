@@ -110,7 +110,7 @@ const output_abs = (code,tableOfLexemes,lineNumber) => {
     while(code[0].length != 0){
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
             // inline comment
-            [code,tableOfLexemes, lineNumber, changed] = inline_comment_abs(code,tableOfLexemes,lineNumber);
+            [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
             continue;
         }else if(code[0].join(" ").trim().split(" ")[0] == "!"){
             // no new line encountered
@@ -376,7 +376,7 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt=0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     while(tableOfLexemes[tableOfLexemes.length-1].value != "MKAY"){
-        if(code[0].length == 0){
+        if(code[0].length == 0 && ["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
         }
         if(code[0][0] == ""){
@@ -466,6 +466,11 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
         if(code[0].length == 0 && ["AN","SMOOSH"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             // lacking operand after AN
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        }
+        if(cnt < 2 && code[0].join(" ").trim().split(" ")[0] == "BTW"){
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        }else if(cnt >= 2 && tableOfLexemes[tableOfLexemes.length-1].value != "AN" && code[0].join(" ").trim().split(" ")[0] == "BTW" ){
+            break;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -842,8 +847,9 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
     }
     if(code[0].length != 0){
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
+            code[0] = code[0].join(" ").trim().split(" ");
             // inline comment
-            [code,tableOfLexemes, lineNumber, changed] = inline_comment_abs(code,tableOfLexemes,lineNumber);
+            [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
         }else if(code[0].length != 0){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
