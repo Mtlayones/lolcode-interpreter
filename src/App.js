@@ -1,19 +1,19 @@
 import './App.css';
 import React, {useState} from 'react'
 import FirstFrame from './gui components/firstFrame';
+import SecondFrame from './gui components/secondFrame'
 
 function App() {
-  const [lolCodeData,setLolCodeData] = useState({})
-  console.log(lolCodeData)
+  const [lolText,setLolText] = useState('')
   return (
     <div className="App">
       <div className = "mainWrapper">
 
         <div className = "firstRow">
-            <FirstFrame></FirstFrame>
+          <FirstFrame lolText = {lolText} setLolText = {setLolText} />
             
           <div className = "secondFrame">
-            UWU2
+            <SecondFrame lolText = {lolText}/>
           </div>
 
         </div>

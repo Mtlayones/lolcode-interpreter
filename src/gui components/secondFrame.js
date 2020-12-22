@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 
-function SecondFrame(){
+function SecondFrame(props){
+    const text = props.lolText
+
+    return(
+        <p>{text}</p>
+    )
 
 }
 

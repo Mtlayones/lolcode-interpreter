@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import '../App.css'
 function FirstFrame (props) {
   const { Dragger } = Upload
-  const [text, setText] = useState('')
+  const [text, setText] = useState(props.lolText)
   const [files, setfiles] = useState([])
   const [fileProperty, setFileProperty] = useState({
   name: 'file',
@@ -12,6 +12,7 @@ function FirstFrame (props) {
   accept : ".lol",
   beforeUpload(file){
     readFile(file)
+
     return false
   },
   onChange(info){
@@ -19,6 +20,7 @@ function FirstFrame (props) {
   },
   onRemove(file){
     setText('')
+    props.setLolText('')
   }
 })
 // This Part handle changes in the file (i.e if a file is added)
@@ -26,11 +28,13 @@ const handleChange = (info) => {
   let fileList = [...info.fileList];
   fileList = fileList.slice(-1);
   setfiles(fileList)
+  
 }
 // This part catches the file that is uploaded/dragged to the Upload field
 const readFile = async(file) => {
     const text = await file.text()
     setText(text)
+    props.setLolText(text)
   }
 
   return (
