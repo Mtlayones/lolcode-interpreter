@@ -295,7 +295,7 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
 // boolean operations op abstraction  //optimized
 const boolean_operands_abs = (code, tableOfLexemes, lineNumber, type) => {
     let error, changed = false;
-    if(keywords[code[0][1] && [code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "BOOLEAN"){
+    if(code[0][1] && keywords[[code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "Boolean"){
         // boolean operations
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
         error = boolean_recurse_abs(code,tableOfLexemes,lineNumber);
