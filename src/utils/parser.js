@@ -68,7 +68,9 @@ const literal_abs = (code,tableOfLexemes,lineNumber) => {
 const identifier_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder;
     placeholder = code[0].shift();
-    if(keywords[placeholder] || ["WIN","FAIL"].includes(placeholder) || !identifier[0].test(placeholder)){
+    if(placeholder[0] == '\'' &&  placeholder[placeholder.length-1] == '\'' || placeholder[0] == '\'' ){
+        return `Syntax Error in line ${lineNumber}: Unexpected Sequence: ${placeholder}.`;
+    }else if(keywords[placeholder] || ["WIN","FAIL"].includes(placeholder) || !identifier[0].test(placeholder)){
         return `Syntax Error in line ${lineNumber}: Expected Identifier: ${placeholder}.`;
     }else{
         tableOfLexemes.push({value:placeholder, description: identifier[1]});
@@ -944,7 +946,7 @@ const yarn_token_abs = (code,lineNumber) => {
     while(true){
         index1 = code[0].findIndex((word)=>literal["YARN1"][0].test(word));
         if(index1 == -1) break;
-        index2 = code[0].findIndex((word,index)=>((literal["YARN2"][0].test(word) || /(^[\"\'][^\"\']*[\"\']\!$)/.test(word)) && index != index1));
+        index2 = code[0].findIndex((word,index)=>(literal["YARN2"][0].test(word) && index != index1));
         if(index2>-1){
             code[0][index1] = code[0].slice(index1,index2+1).join(" ");
             code[0] = code[0].slice(0,index1+1).concat(code[0].slice(index2+1,code[0].length));

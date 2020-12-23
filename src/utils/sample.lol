@@ -1,3 +1,3 @@
 HAI
-    SMOOSH " wat" AN "wat "
+    VISIBLE "DSADAS asdasd asdas"!
 KTHXBYE
