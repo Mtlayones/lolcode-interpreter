@@ -78,7 +78,7 @@ const identifier_abs = (code,tableOfLexemes,lineNumber) => {
 
 // operands abstraction
 const operands_abs = (code,tableOfLexemes,lineNumber,type) => {
-    let error;
+    let error,changed;
     // literal
     [code,tableOfLexemes, lineNumber, changed] = literal_abs(code,tableOfLexemes,lineNumber);
     // expression
@@ -859,7 +859,7 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
 
 // type casting of expression //optimized
 const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
-    let placeholder = code[0].shift();
+    let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
