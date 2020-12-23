@@ -8,7 +8,7 @@ function App() {
   // lolText contains the text data only
   const [lolText,setLolText] = useState('')
   // lolParser will contain the parsed data
-  const [lolParser,setLolParser] = useState([])
+  const [parsedLol,setParsedLol] = useState([])
   return (
     <div className="App">
       {/* mainWrapper is the Main parent for all the components */}
@@ -18,7 +18,7 @@ function App() {
           <FirstFrame lolText = {lolText} setLolText = {setLolText}/>
       
           <div className = "secondFrame">
-            <SecondFrame setLolParser = {setLolParser} lolParser = {lolParser} lolText = {lolText} program_abs = {program_abs}/>
+            <SecondFrame setParsedLol = {setParsedLol} parsedLol = {parsedLol} lolText = {lolText} program_abs = {program_abs}/>
           </div>
         
         </div>
