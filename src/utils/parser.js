@@ -111,6 +111,12 @@ const operands_abs = (code,tableOfLexemes,lineNumber,type) => {
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
     }
+    // if command line break encountered
+    if(code[0].join(" ").trim().split(" ")[0] == ","){
+        code[0] = code[0].join(" ").trim().split(" ");
+        code[0].shift()
+        tableOfLexemes.push({value:",",description:"Command Line Break"});
+    }
     return [code,tableOfLexemes, lineNumber];
 }
 
@@ -196,6 +202,12 @@ const initialization_var_abs = (code,tableOfLexemes,lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
+        // if command line break encountered
+        if(code[0].join(" ").trim().split(" ")[0] == ","){
+            code[0] = code[0].join(" ").trim().split(" ");
+            code[0].shift()
+            tableOfLexemes.push({value:",",description:"Command Line Break"});
+        }
     }else{
         //operands
         error = operands_abs(code,tableOfLexemes,lineNumber, true);
@@ -232,18 +244,19 @@ const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
     }
+    // if command line break encountered
+    if(code[0].join(" ").trim().split(" ")[0] == ","){
+        code[0] = code[0].join(" ").trim().split(" ");
+        code[0].shift()
+        tableOfLexemes.push({value:",",description:"Command Line Break"});
+        return [code,tableOfLexemes, lineNumber];
+    }
     if(code[0][0] == "ITZ"){
         // initialization
         error = initialization_var_abs(code,tableOfLexemes,lineNumber);
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-    }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
     }
     return [code,tableOfLexemes, lineNumber];
 }
@@ -285,12 +298,6 @@ const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-        // if command line break encountered
-        if(code[0].join(" ").trim().split(" ")[0] == ","){
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
-        }
     }
     return [code,tableOfLexemes, lineNumber];
 }
@@ -321,12 +328,6 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             // if inproper use of AN
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
-    }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
     }
     return [code,tableOfLexemes, lineNumber];
 }
@@ -407,12 +408,6 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             }
         }
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
@@ -445,12 +440,6 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
@@ -479,12 +468,6 @@ const comparison_abs = (code,tableOfLexemes,lineNumber) => {
             // if inproper use of AN
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
-    }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
     }
     return [code,tableOfLexemes, lineNumber];
 }
@@ -554,12 +537,6 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
                 return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
             }
         }
-    }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
     }
     return [code,tableOfLexemes, lineNumber];
 } 
@@ -821,12 +798,6 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                     // check if error
                     if(!Array.isArray(error)) return error;
                     [code,tableOfLexemes, lineNumber] = error;
-                    // if command line break encountered
-                    if(code[0].join(" ").trim().split(" ")[0] == ","){
-                        code[0] = code[0].join(" ").trim().split(" ");
-                        code[0].shift()
-                        tableOfLexemes.push({value:",",description:"Command Line Break"});
-                    }
                     // body of the loop
                     while(!end){
                         if(code.length == 0){
@@ -919,6 +890,13 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber, changed] = error;
+    }else{
+        // if command line break encountered
+        if(code[0].join(" ").trim().split(" ")[0] == ","){
+            code[0] = code[0].join(" ").trim().split(" ");
+            code[0].shift()
+            tableOfLexemes.push({value:",",description:"Command Line Break"});
+        }
     }
     if(!changed){
         changed = true;
@@ -966,7 +944,13 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
         error = identifier_abs(code,tableOfLexemes,lineNumber);
         // check if error
         if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber] = error;            
+        [code,tableOfLexemes, lineNumber] = error;
+        // if command line break encountered
+        if(code[0].join(" ").trim().split(" ")[0] == ","){
+            code[0] = code[0].join(" ").trim().split(" ");
+            code[0].shift()
+            tableOfLexemes.push({value:",",description:"Command Line Break"});
+        }            
     }
     if(code[0].length != 0){
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
@@ -998,7 +982,7 @@ const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
     // typecasting to data type
-    if(code[0][0] == "A" ){
+    if(code[0][0] == "A" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
         //type init
         error = type_init_abs(code,tableOfLexemes,lineNumber);
         // check if error
@@ -1093,7 +1077,18 @@ const tokenizer_abs = (code,lineNumber) => {
         if(item[0] == '\"' && item[item.length-1] == '\"'){
             tempHolder.push(item);
         }else{
-            tempHolder.push(...item.replace(/[\,]/g, " ,").replace(/[\!]/g, " !").trim().replace(/[\!]/g, "! ").replace(/[\,]/g, ", ").trim().split(" "));
+            let temp_array = item.replace(/[\,]/g, " ,").replace(/[\!]/g, " !").trim().replace(/[\!]/g, "! ").replace(/[\,]/g, ", ").trim().split(" ");
+            if(item[0] == '\"'){
+                const index1 = temp_array.findIndex((word)=>literal["YARN1"][0].test(word));
+                if(index1 != -1){
+                    const index2 = temp_array.findIndex((word,index)=>(literal["YARN2"][0].test(word) && index != index1));
+                    if(index1 != -1){
+                        temp_array[index1] = temp_array.slice(index1,index2+1).join(" ");
+                        temp_array = temp_array.slice(0,index1+1).concat(temp_array.slice(index2+1,temp_array.length));
+                    }
+                }
+            }
+            tempHolder.push(...temp_array);
         }
       })
     code[0] = tempHolder;

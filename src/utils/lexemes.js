@@ -57,8 +57,8 @@ exports.keywords =
 exports.literals = {
     "NUMBR":[/(^\-?[0-9]+$)/,'NUMBR Literal'],
     "NUMBAR":[/(^\-?[0-9]+\.[0-9]+$)/,'NUMBAR Literal'],
-    "YARN1":[/(^[\"\']([^\"]|(\:\"))*$)/,'YARN Literal'],
-    "YARN2":[/(^([^\"]|(\:\"))*[\"\'][\!\,]{0,2}$)/,'YARN Literal'],
+    "YARN1":[/(^[\"]([^\"]|(\:\"))*$)/,'YARN Literal'],
+    "YARN2":[/(^([^\"]|(\:\"))*[\"][\!\,]{0,2}$)/,'YARN Literal'],
     "YARN":[/(^[\"]([^\"]|(\:\"))*[\"]$)/,'YARN Literal'],
     "TROOF":[/^((WIN)|(FAIL))$/,'TROOF Literal'],
 }
