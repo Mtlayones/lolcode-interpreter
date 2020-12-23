@@ -1,6 +1,3 @@
 HAI
-    ALL OF WIN AN WIN AN WIN AN FAIL AN WIN MKAY
-    VISIBLE IT
-    ANY OF WIN AN WIN AN WIN AN FAIL AN WIN MKAY
-    SMOOSH bbsadasd AN basdbasbd AN sdaasdas    BTW asdasdasd
+    SMOOSH " wat" AN "wat "
 KTHXBYE

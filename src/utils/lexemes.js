@@ -70,4 +70,5 @@ exports.types = {
     "NUMBAR":['Type','NUMBAR Type'],
     "YARN":['Type','YARN Type'],
     "TROOF":['Type','TROOF Type'],
+    "NOOB" : ['Type','NOOB Type'],
 }
