@@ -1,3 +1,4 @@
 HAI
-    VISIBLE "DSADAS asdasd asdas"!
+    OBTW
+    TLDR
 KTHXBYE
