@@ -34,8 +34,6 @@ const readFile = async(file) => {
     const text = await file.text()
     setText(text)
     props.setLolText(text)
-    props.setContentChange(true) 
-    console.log(props.contentChange)
   }
 
   return (

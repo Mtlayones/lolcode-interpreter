@@ -1,19 +1,17 @@
 import React, { useState,useEffect } from 'react';
 
 function SecondFrame(props){
-    const [parsed, setparsed] = useState(props.lolParser)
-
     // component on Mount
     useEffect(() => {
-        console.log(parsed)
+        console.log(props.lolParser)
     },[])
-
+    // Updates the parser for every change in the text in the first frame
     useEffect(() => {
         const hello = props.program_abs(props.lolText,[],1)
-        setparsed({...hello[2]})
-        console.log(parsed)
+        props.setLolParser(hello[2])
+        console.log(props.lolParser)
     },[props.lolText])
-    
+
     return(
         <p></p>
     )

@@ -9,18 +9,16 @@ function App() {
   const [lolText,setLolText] = useState('')
   // lolParser will contain the parsed data
   const [lolParser,setLolParser] = useState([])
-  // contentChange  will keep track if there is a change with the files handled (i.e if a file is dragged to the first frame)
-  const [contentChange, setContentChange] = useState(false)
   return (
     <div className="App">
       {/* mainWrapper is the Main parent for all the components */}
       <div className = "mainWrapper">
       {/* First Row contains the First Frame and Second Frame (File Browser and Symbol Table) */}
         <div className = "firstRow">
-          <FirstFrame lolText = {lolText} setLolText = {setLolText} setContentChange = {setContentChange} contentChange = {contentChange}/>
+          <FirstFrame lolText = {lolText} setLolText = {setLolText}/>
       
           <div className = "secondFrame">
-            <SecondFrame setLolParser = {setLolParser} lolParser = {lolParser} lolText = {lolText} program_abs = {program_abs} contentChange = {contentChange} setContentChange = {setContentChange}/>
+            <SecondFrame setLolParser = {setLolParser} lolParser = {lolParser} lolText = {lolText} program_abs = {program_abs}/>
           </div>
         
         </div>
