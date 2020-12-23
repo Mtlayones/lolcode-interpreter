@@ -19,8 +19,8 @@ exports.keywords =
         "EITHER OF":['Boolean','OR Operation Keyword'],
         "WON OF":['Boolean','XOR Operation Keyword'],
         "NOT":['Boolean','NOT Operation Keyword'],
-        "ANY OF":['Boolean Many','AND Delimiter Operation Keyword'],
-        "ALL OF":['Boolean Many','OR Delimiter Operation Keyword'],
+        "ANY OF":['Boolean Many','OR Delimiter Operation Keyword'],
+        "ALL OF":['Boolean Many','AND Delimiter Operation Keyword'],
         "BOTH SAEM":['Comparison','Equal Operation Keyword'],
         "DIFFRINT":['Comparison','Not Equal Operation Keyword'],
         "SMOOSH":['Concat','Concatenation Operation Keyword'],
@@ -72,3 +72,4 @@ exports.types = {
     "TROOF":['Type','TROOF Type'],
     "NOOB" : ['Type','NOOB Type'],
 }
+
