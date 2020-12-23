@@ -36,15 +36,13 @@ const multiline_comment_abs = (code, tableOfLexemes, lineNumber) =>{
         lineNumber++;
     }
     const indexTLDR = code[0].indexOf("TLDR");
-    // if there is operation after TLDR
-    if(indexTLDR < (code[0].length-1) ) return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].slice(indexTLDR+1,code[0].length).join(" ").trim()}.`;
     // if there is comment before TLDR
     if(indexTLDR != 0){
         placeholder = code[0].slice(0,indexTLDR).join(" ").trim();
         tableOfLexemes.push({value:placeholder,description:'Comment'});
     }
     tableOfLexemes.push({value:'TLDR',description:keywords['TLDR'][1]});
-    code[0] = [];
+    code[0] = code[0].slice(indexTLDR+1,code[0].length).join(" ").trim().split();
     return [code, tableOfLexemes, lineNumber];
 }
 
@@ -80,7 +78,7 @@ const identifier_abs = (code,tableOfLexemes,lineNumber) => {
 
 // operands abstraction
 const operands_abs = (code,tableOfLexemes,lineNumber,type) => {
-    let error;
+    let error,changed;
     // literal
     [code,tableOfLexemes, lineNumber, changed] = literal_abs(code,tableOfLexemes,lineNumber);
     // expression
@@ -104,14 +102,11 @@ const operands_abs = (code,tableOfLexemes,lineNumber,type) => {
 const output_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift() , nonewline = "", error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-    if(code[0].length == 0){
-        return `Syntax Error in line ${lineNumber}: Missing Operands after VISIBLE.`;
-    }
-    while(code[0].length != 0){
-        if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
-            // inline comment
-            [code,tableOfLexemes, lineNumber, changed] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-            continue;
+    while(true){
+        if(tableOfLexemes[tableOfLexemes.length-1].value == "VISIBLE" && (code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0)){
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }else if(code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0){
+            break;
         }else if(code[0].join(" ").trim().split(" ")[0] == "!"){
             // no new line encountered
             code[0] = code[0].join(" ").trim().split(" ");
@@ -148,7 +143,7 @@ const input_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift();
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
-        return `Syntax Error in line ${lineNumber}: Missing Operands after GIMMEH.`;
+        return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
@@ -167,7 +162,7 @@ const initialization_var_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
-        return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
@@ -194,7 +189,7 @@ const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift();
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
-        return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
@@ -202,14 +197,18 @@ const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
     }
     // identifier
     let error = identifier_abs(code,tableOfLexemes,lineNumber);
-    // check if error
+    // check if error   
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
-    tableOfLexemes[tableOfLexemes.length-1].description = "Variable Identifier"
+    tableOfLexemes[tableOfLexemes.length-1].description = "Variable Identifier";
     // if special IT identifier
     if(tableOfLexemes[tableOfLexemes.length-1].value == "IT"){
         placeholder = tableOfLexemes.pop();
         return `Syntax Error in line ${lineNumber}: ${placeholder.value} is a Special Identifier.`;
+    }
+    if(code[0][0] == ""){
+        // if there is exceeding whitespace in between the operation
+        return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
     }
     if(code[0][0] == "ITZ"){
         // initialization
@@ -240,7 +239,7 @@ const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
         return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
     }
     if(code[0].length == 0){
-        return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
@@ -269,7 +268,7 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     let i,error;
     for (i = 0; i < 3; i++){
         if(code[0].length == 0){
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -295,7 +294,7 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
 // boolean operations op abstraction  //optimized
 const boolean_operands_abs = (code, tableOfLexemes, lineNumber, type) => {
     let error, changed = false;
-    if(keywords[code[0][1] && [code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "BOOLEAN"){
+    if(code[0][1] && keywords[[code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "Boolean"){
         // boolean operations
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
         error = boolean_recurse_abs(code,tableOfLexemes,lineNumber);
@@ -333,7 +332,7 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(tableOfLexemes[tableOfLexemes.length - 1].value == "NOT"){
         if(code[0].length == 0){
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -347,7 +346,7 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     }else{
         for (i = 0; i < 3; i++){
             if(code[0].length == 0){
-                return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+                return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
             }
             if(code[0][0] == ""){
                 // if there is exceeding whitespace in between the operation
@@ -376,19 +375,19 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt=0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     while(tableOfLexemes[tableOfLexemes.length-1].value != "MKAY"){
-        if(code[0].length == 0){
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+        if(code[0].length == 0 && ["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
         }
-        if(["ANY OF","AN"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        if(["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             //operands
             error = operands_abs(code,tableOfLexemes,lineNumber, false);
             // check if error
             if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber] = error;
+            [code,tableOfLexemes, lineNumber] = error;
             cnt ++;
         }else if(code[0][0] == "AN"){
             placeholder = code[0].shift();
@@ -409,7 +408,7 @@ const comparison_abs = (code,tableOfLexemes,lineNumber) => {
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     for (i = 0; i < 3; i++){
         if(code[0].length == 0){
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -465,7 +464,12 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
     while(tableOfLexemes[tableOfLexemes.length-1].value != "MKAY"){
         if(code[0].length == 0 && ["AN","SMOOSH"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             // lacking operand after AN
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }
+        if(cnt < 2 && code[0].join(" ").trim().split(" ")[0] == "BTW"){
+            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }else if(cnt >= 2 && tableOfLexemes[tableOfLexemes.length-1].value != "AN" && code[0].join(" ").trim().split(" ")[0] == "BTW" ){
+            break;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -642,7 +646,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
 
 // loop abstraction
 const loop_abs = (code, tableOfLexemes, lineNumber) => {
-    let placeholder = code[0].shift(),error,cnt = 0,end=false;
+    let placeholder = code[0].shift(),error,end=false;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
@@ -651,6 +655,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
     }
+    // for the name of the loop with the YR before
     if(code[0][0] == "YR"){
         placeholder = code[0].shift();
         tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -659,6 +664,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
+        tableOfLexemes[tableOfLexemes.length-1].description = "Loop Identifier";
         if(code[0].length == 0){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
         }
@@ -666,6 +672,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
         }
+        // increment or decrement with the UPPIN and the NERFIN
         if(code[0][0] == "UPPIN" | code[0][0] == "NERFIN"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -676,6 +683,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                 // if there is exceeding whitespace in between the operation
                 return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
             }
+            // variable to be incremented with YR before
             if(code[0][0] == "YR"){
                 placeholder = code[0].shift();
                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -684,6 +692,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                 // check if error
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
+                // the conditionals in the loop
                 if(code[0][0] == "TIL" | code[0][0] == "WILE"){
                     placeholder = code[0].shift();
                     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -694,11 +703,13 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                         // if there is exceeding whitespace in between the operation
                         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
                     }
+                    // the condition
                     //operands
                     error = operands_abs(code,tableOfLexemes,lineNumber, true);
                     // check if error
                     if(!Array.isArray(error)) return error;
                     [code,tableOfLexemes, lineNumber] = error;
+                    // body of the loop
                     while(!end){
                         if(code.length == 0){
                             return `Syntax Error in line ${lineNumber-1}: Expected End of the Loop.`;
@@ -716,6 +727,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                             }
                             continue;
                         }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IM OUTTA"){
+                            // loop code delimiter
                             placeholder = [code[0].shift(),code[0].shift()].join(' ');
                             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
                             if(code[0].length == 0){
@@ -725,6 +737,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                                 // if there is exceeding whitespace in between the operation
                                 return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
                             }
+                            // name of the loop after the YR
                             if(code[0][0] == "YR"){
                                 placeholder = code[0].shift();
                                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -745,6 +758,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber) => {
                             }
                             end = true
                         }else{
+                            // body of the loop
                             error = statement_abs(code,tableOfLexemes,lineNumber);
                             if(!Array.isArray(error)) return error;
                             [code,tableOfLexemes, lineNumber] = error;
@@ -824,7 +838,6 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
         }
     }
     if(!changed){
-        changed = true;
         // identifier
         error = identifier_abs(code,tableOfLexemes,lineNumber);
         // check if error
@@ -833,8 +846,9 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
     }
     if(code[0].length != 0){
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
+            code[0] = code[0].join(" ").trim().split(" ");
             // inline comment
-            [code,tableOfLexemes, lineNumber, changed] = inline_comment_abs(code,tableOfLexemes,lineNumber);
+            [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
         }else if(code[0].length != 0){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
@@ -845,7 +859,7 @@ const statement_abs = (code,tableOfLexemes,lineNumber) => {
 
 // type casting of expression //optimized
 const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
-    let placeholder = code[0].shift();
+    let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${placeholder}.`;
@@ -930,7 +944,7 @@ const yarn_token_abs = (code,lineNumber) => {
     while(true){
         index1 = code[0].findIndex((word)=>literal["YARN1"][0].test(word));
         if(index1 == -1) break;
-        index2 = code[0].findIndex((word)=>(literal["YARN2"][0].test(word) || /(^[\"\'][^\"\']*[\"\']\!$)/.test(word)));
+        index2 = code[0].findIndex((word,index)=>((literal["YARN2"][0].test(word) || /(^[\"\'][^\"\']*[\"\']\!$)/.test(word)) && index != index1));
         if(index2>-1){
             code[0][index1] = code[0].slice(index1,index2+1).join(" ");
             code[0] = code[0].slice(0,index1+1).concat(code[0].slice(index2+1,code[0].length));
@@ -972,7 +986,7 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
             continue;
-        }else if((!start || tableOfLexemes[tableOfLexemes.length - 1].value == "\n") && code[0][0] == 'OBTW'){
+        }else if((!start || (end && tableOfLexemes[tableOfLexemes.length-1].value == "\n")) && code[0][0] == 'OBTW'){
             // multiline comment
             error = multiline_comment_abs(code,tableOfLexemes,lineNumber);
             if(!Array.isArray(error)) return error;
@@ -1004,6 +1018,4 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
     return [code,tableOfLexemes, lineNumber]; 
 }
 
-fs.readFile('./sample.lol', 'utf8', function(err, data){ 
-    console.log(program_abs(data,[],1));
-}); 
+export default program_abs

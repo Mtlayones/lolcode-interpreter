@@ -12,7 +12,6 @@ function FirstFrame (props) {
   accept : ".lol",
   beforeUpload(file){
     readFile(file)
-
     return false
   },
   onChange(info){
@@ -35,6 +34,8 @@ const readFile = async(file) => {
     const text = await file.text()
     setText(text)
     props.setLolText(text)
+    props.setContentChange(true) 
+    console.log(props.contentChange)
   }
 
   return (
