@@ -37,13 +37,13 @@ const recursive_operations = (code,symbol_table, lexicon, line_number) =>
 	if (code.value == "NOT") req_ops = 1; // not requires only 1 operand
 	else if (code.value == "ANY OF" || code.value == "ALL OF") req_ops = -1; // infinite operands
 
-	while(cur_code.value != "\n")
+	while(cur_code.value != "\n" && cur_code.value != ",")
 	{
 		switch(cur_code.description)
 		{
-			case "NUMBR Literal": operands.push({value:Number(cur_code.value), type:"NUMBR"});
+			case "NUMBR Literal": operands.push({value:Number(cur_code.value), type:"NUMBR", name:"Literal"});
 				break;
-			case "NUMBAR Literal": operands.push({value:Number(cur_code.value), type:"NUMBAR"});
+			case "NUMBAR Literal": operands.push({value:Number(cur_code.value), type:"NUMBAR", name: "Literal"});
 				break;
 			case "YARN Literal": operands.push({value:cur_code.value, type:"YARN"});
 				break;
@@ -101,9 +101,7 @@ const arithmetic_operations = (code, operands, line_number, symbol_table) =>
 		else if (operands[i].type != "NOOB" && operands[i].value == undefined) return `Error in line ${line_number}: variable ${operands[i].name} is uninitialized before use`;
 		else if (operands[i].type == "TROOF")
 		{
-			operands[i].value = (operands[i].value == "WIN")
-			if (operands[i].value == "WIN") operands[i].value = 1;
-			else operands[i].value = 0;
+			operands[i].value = (operands[i].value == "WIN")? 1: 0;
 			operands[i].type = "NUMBR";
 		}
 		if (operands[i].type == "YARN")
@@ -149,7 +147,12 @@ const boolean_operations = (code, operands, line_number, symbol_table) =>
 {
 	let i;
 	for (i = 0; i<operands.length; i++){
-		if(operands[i].type != "TROOF") operands[i].value = typecast_to_TROOF(operands[i].value, operands[i].type);
+		if(operands[i].type != "TROOF")
+		{
+			let name = (operands[i].name != undefined)? operands[i].name : "";
+			operands[i].value = typecast_to_TROOF(operands[i].value, operands[i].type, name, line_number);
+			if (operands[i].value != "WIN" && operands[i].value != "FAIL") return operands[i].value;
+		}
 	}
 	let result;
 	if (code == "NOT")
@@ -227,16 +230,16 @@ const assignment_operation = (code, symbol_table, lexicon, line_number) =>
 			let type;
 			var result;	
 			cur_code = symbol_table.shift();
-			while(cur_code.value != "\n")
+			while(cur_code.value != "\n" && cur_code.value != ",")
 			{
 				
 				switch(cur_code.description)
 				{
 					case 'Variable Assignment Keyword': break;
-					case 'NUMBR Literal': value = cur_code.value;
+					case 'NUMBR Literal': value = Number(cur_code.value);
 						type = "NUMBR";
 						break;
-					case 'NUMBAR Literal': value = cur_code.value;
+					case 'NUMBAR Literal': value = Number(cur_code.value);
 						type = "NUMBAR";
 						break;
 					case 'TROOF Literal': value = cur_code.value;
@@ -299,12 +302,12 @@ const ask_input = (symbol_table, lexicon, line_number) =>
 */
 const output = (symbol_table,lexicon,line_number) =>
 {
-	var code = symbol_table.shift();
+	let code = symbol_table.shift();
 	let error;
 	let value;
 	let type;
 	let to_print = "";
-	while(code.value != "\n")
+	while(code.value != "\n" && code.value != ",")
 	{
 		switch(code.description)
 		{
@@ -361,7 +364,7 @@ const variable_dec_init = (symbol_table, lexicon,line_number) =>
 	var type = "NOOB";
 	init = false; // will only be used in YARN types
 	code = symbol_table.shift(); // gets next code
-	while (code.value != '\n')
+	while (code.value != '\n' && code.value != ",")
 	{// iterates until it encounters a new line
 		switch(code.description)
 		{
@@ -369,8 +372,6 @@ const variable_dec_init = (symbol_table, lexicon,line_number) =>
 				type = "NUMBR";
 				break;
 			case "NUMBAR Literal": value = Number(code.value);
-				if (Number.isInteger(value)) value = value.toFixed(1);
-				console.log(value);
 				type = "NUMBAR";
 				break;
 			case "TROOF Literal": value = code.value;
@@ -409,7 +410,7 @@ const variable_dec_init = (symbol_table, lexicon,line_number) =>
 	return [symbol_table, lexicon];
 }
 
-const typecast_to_NUMBR = (value, type, name) =>
+const typecast_to_NUMBR = (value, type, name, line_number) =>
 {
 	if (operands[i].type == "NOOB") return `Error in line ${line_number}: NOOB value cannot by implicitly typecasted into a NUMBR`;
 	else if (value == undefined) return `Error in line ${line_number}: variable ${name} is uninitialized before use`;
@@ -431,9 +432,10 @@ const typecast_to_NUMBR = (value, type, name) =>
 	return value;
 }
 
-const typecast_to_TROOF = (value, type) =>
+const typecast_to_TROOF = (value, type, name, line_number) =>
 {
-	if (value == undefined) return "FAIL";
+	if (type == "NOOB") return "FAIL";
+	else if(value == undefined) return `Error in line ${line_number}: variable ${name} is uninitialized before use`;
 	else if(type == "NUMBAR" || type == "NUMBR") return ((value != 0)? "WIN": "FAIL");
 	else
 	{
@@ -445,34 +447,70 @@ const typecast_to_TROOF = (value, type) =>
 	}
 } 
 
+const skip_nested_ifelse = (symbol_table, line_number) =>
+{
+	code = symbol_table.shift();
+	while(code.value != "OIC")
+	{
+		if(code.value == "\n") line_number++;
+		else if(code.value == "O RLY")
+		{
+			[symbol_table, line_number] = skip_nested_ifelse(symbol_table, line_number);
+		}
+		code = symbol_table.shift();
+	}
+
+	return [symbol_table, line_number];
+}
+
 const if_else_control = (symbol_table, lexicon, line_number) =>
 {
 	let finished = false;
-	lexicon[i].value = typecast_to_TROOF(lexicon[0].value, lexicon[0].type);
-	lexicon[i].type = "TROOF";
-
-
-
-}
-
-
-
-const program_start = (symbol_table) =>
-{
-	var symbol_table = removeComments(symbol_table); // removes comments in the symbol table
-	// console.log(symbol_table)
-	var line_number = 1;
-	let result;
-	let value;
-	let type;
-	let error;
-	var lexicon = [{name:"IT", value:undefined, type:"NOOB"}];
-	while(symbol_table.length != 0)
+	lexicon[0].value = typecast_to_TROOF(lexicon[0].value, lexicon[0].type);
+	lexicon[0].type = "TROOF";
+	let vars = [];
+	let found = (lexicon[0].value == "WIN");
+	code = symbol_table.shift();
+	while(code.value != "OIC")
 	{
-		code = symbol_table.shift();
-		switch (code.description)
+		if(found) break;
+		switch(code.description)
 		{
+			case 'If-Else Delimiter Keyword': 
+				[symbol_table, line_number] = skip_nested_ifelse(symbol_table,line_number);
 			case 'Line Break': line_number++;
+				break;
+			case 'Else-If Keyword':
+				code = symbol_table.shift();
+				error = recursive_operations(code, symbol_table, lexicon, line_number);
+				if(!Array.isArray(error)) return error;
+				[lexicon[0].value, lexicon[0].type, symbol_table] = error;
+				line_number++;
+				lexicon[0].value = typecast_to_TROOF(lexicon[0].value, lexicon[0].type);
+				lexicon[0].type = "TROOF";
+				found = (lexicon[0].value == "WIN");
+				break;
+			case 'Else Keyword': found = true;
+		}
+		code = symbol_table.shift();
+	}
+
+	let to_continue = found;
+
+	while(to_continue && code.value != "OIC")
+	{
+		switch(code.description)
+		{
+			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, line_number);
+				if(!Array.isArray(error)) return error;
+				[symbol_table, line_number] = error;
+				break;
+			case 'Line Break': line_number++;
+			case 'If Keyword':
+			case 'Control Flow Delimiter':
+			case 'Command Line Break': break;
+			case 'Else-If Keyword': 
+			case 'Else Keyword': to_continue = false;
 				break;
 			case 'Variable Declaration Keyword': 
 				error = variable_dec_init(symbol_table, lexicon,line_number);
@@ -494,7 +532,70 @@ const program_start = (symbol_table) =>
 				symbol_table = error;
 				line_number++;
 				break;
+			default: error = recursive_operations(code, symbol_table, lexicon, line_number);
+				if(!Array.isArray(error)) return error;
+				[value, type, symbol_table] = error;
+				lexicon[0].value = value;
+				lexicon[0].type = type;
+				line_number++;	
+		}
+		code = symbol_table.shift();
+	}
+
+	while(code.value != "OIC") code = symbol_table.shift();
+
+	return [symbol_table, line_number];
+}
+
+
+
+const program_start = (symbol_table) =>
+{
+	var symbol_table = removeComments(symbol_table); // removes comments in the symbol table
+	var line_number = 1;
+	let result;
+	let value;
+	let type;
+	let error;
+	var lexicon = [{name:"IT", value:undefined, type:"NOOB"}];
+	while(symbol_table.length != 0)
+	{
+		code = symbol_table.shift();
+		switch (code.description)
+		{
+			case 'Line Break': line_number++;
+				break;
+			case 'Command Line Break': break;
+			case 'Variable Declaration Keyword': 
+				error = variable_dec_init(symbol_table, lexicon,line_number);
+				if(!Array.isArray(error)) return error;
+				[symbol_table, lexicon] = error;
+				line_number++;
+				break;
+			case 'Identifier': assignment_operation(code, symbol_table, lexicon, line_number);
+				line_number++;
+				break;
+			case 'Output Keyword':
+				error = output(symbol_table,lexicon,line_number);
+				if(!Array.isArray(error)) return error;
+				symbol_table = error;
+				line_number++;
+				break;
+			case 'Input Keyword': error = ask_input(symbol_table, lexicon, line_number);
+				if(!Array.isArray(error)) return error;
+				symbol_table = error;
+				line_number++;
+				break;
+			case 'If Keyword':
+			case 'Else-IF Keyword':
+			case 'Else Keyword':
+			case 'Flow-Control Delimiter Keyword':
 			case 'Code Delimiter Keyword': break;
+			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, line_number);
+				if(!Array.isArray(error)) return error;
+				[symbol_table, line_number] = error;
+				line_number++;
+				break;
 			default: error = recursive_operations(code, symbol_table, lexicon, line_number);
 				if(!Array.isArray(error)) return error;
 				[value, type, symbol_table] = error;
@@ -504,10 +605,15 @@ const program_start = (symbol_table) =>
 		}	
 	}
 
+	for(let i = 0; i < lexicon.length; i++)
+	{
+		if (lexicon[i].type == "NUMBAR" && Number.isInteger(lexicon[i].value)) lexicon[i].value = parseFloat(lexicon[i].value.toFixed(1));
+	}
+
 	return lexicon
 }
 
-fs.readFile('./testcases/ops/boolop.lol', 'utf8', function(err, data){ 
+fs.readFile('./testcases/ifelse.lol', 'utf8', function(err, data){ 
     if(err) throw err;
     let error = syntax.parser(data,[],1);
     // console.log(error);
@@ -518,15 +624,3 @@ fs.readFile('./testcases/ops/boolop.lol', 'utf8', function(err, data){
     	console.log(program_start(symbol_table));	
     }
 }); 
-
-
-// reads the JSON file created by parser.js
-// fs.readFile('symbol_table.json', 'utf8', function(err, data)
-// {
-// 	if (err) throw err;
-// 	symbol_table = data.split("\n");// creates an array of the JSON file separeted by new line
-// 	symbol_table.pop();// removes the last element, which is just a new line
-// 	for (var i = 0; i<symbol_table.length; i++){ symbol_table[i] = JSON.parse(symbol_table[i]); }
-// 	//loops the array and converts the strings into a JSON object
-// 	console.log(program_start(symbol_table))	
-// });
