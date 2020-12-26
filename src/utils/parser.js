@@ -648,7 +648,7 @@ const if_else_abs = (code,tableOfLexemes,lineNumber) => {
 
 // Switch Case Abstraction //optimized
 const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder = code[0].shift(),start_active = false,default_active = false,end =false,error,indexConstant=0;
+    let placeholder = code[0].shift(),start_active = false,default_active = false,end =false,error,listOfOptions = [],indexConstant=0;
     placeholder = placeholder.slice(0,placeholder.length-1);
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     tableOfLexemes.push({value:"?",description:'Control Flow Delimiter'});
@@ -692,7 +692,10 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
             [code,tableOfLexemes, lineNumber] = error;
             if(!tableOfLexemes[indexConstant].description.split(" ").includes("Literal")){
                 return `Syntax Error in line ${lineNumber}: Expected Constant Value at ${tableOfLexemes[indexConstant].value}.`;
+            }else if(listOfOptions.includes(tableOfLexemes[indexConstant].value)){
+                return `Syntax Error in line ${lineNumber}: OMG Literal Must be Unique at ${tableOfLexemes[indexConstant].value}.`;
             }
+            listOfOptions.push(tableOfLexemes[indexConstant].value);
             start_active = true;   
         }else if(code[0][0] == "OMGWTF" && start_active && !default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             placeholder = code[0].shift();
