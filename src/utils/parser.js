@@ -416,7 +416,7 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
 const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt=0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-    while(tableOfLexemes[tableOfLexemes.length-1].value != "MKAY"){
+    while(true){
         if(code[0].length == 0 && ["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
@@ -426,7 +426,7 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
         }
         if(["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             //operands
-            error = operands_abs(code,tableOfLexemes,lineNumber, false);
+            error = operands_abs(code,tableOfLexemes,lineNumber, true);
             // check if error
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
@@ -437,6 +437,13 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
         }else if(cnt>=2 && code[0][0] == "MKAY"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
+            // if command line break encountered
+            if(code[0].join(" ").trim().split(" ")[0] == ","){
+                code[0] = code[0].join(" ").trim().split(" ");
+                code[0].shift()
+                tableOfLexemes.push({value:",",description:"Command Line Break"});
+            }
+            break;
         }else if(cnt>=2){
             break;
         }else{
@@ -485,7 +492,7 @@ const expression_abs = (code, tableOfLexemes, lineNumber, type) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-    }else if(keywords[code[0][0]] && keywords[code[0][0]][0] == 'Concat'){
+    }else if(type && keywords[code[0][0]] && keywords[code[0][0]][0] == 'Concat'){
         // concat
         error = concat_abs(code,tableOfLexemes,lineNumber);
         // check if error
@@ -512,7 +519,7 @@ const expression_abs = (code, tableOfLexemes, lineNumber, type) => {
 const concat_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt = 0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-    while(tableOfLexemes[tableOfLexemes.length-1].value != "MKAY"){
+    while(true){
         if(code[0].length == 0 && ["AN","SMOOSH"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             // lacking operand after AN
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
@@ -540,6 +547,13 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
             if(code[0][0] == "MKAY" && cnt>=2){
                 placeholder = code[0].shift();
                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
+                // if command line break encountered
+                if(code[0].join(" ").trim().split(" ")[0] == ","){
+                    code[0] = code[0].join(" ").trim().split(" ");
+                    code[0].shift()
+                    tableOfLexemes.push({value:",",description:"Command Line Break"});
+                }
+                break;
             }else if(cnt>=2){
                 break;
             }else{
