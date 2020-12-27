@@ -1,6 +1,6 @@
 HAI
     WTF?
         OMG 1
-        OMG 2
+        OMGWTF
     OIC
 KTHXBYE

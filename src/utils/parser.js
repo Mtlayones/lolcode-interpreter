@@ -690,7 +690,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
                 [code, lineNumber] = error;
             }
             continue;
-        }else if(code[0][0] == "OMG" && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OMG" && !default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             if(code[0].length == 0){
