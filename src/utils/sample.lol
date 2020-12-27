@@ -1,7 +1,3 @@
 HAI
-    WTF?
-        OMG 1
-        OMG 1.0
-        OMGWTF
-    OIC
+    ALL OF 5 AN 6 AN 7
 KTHXBYE

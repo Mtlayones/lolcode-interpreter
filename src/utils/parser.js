@@ -437,6 +437,8 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
         }else if(cnt>=2 && code[0][0] == "MKAY"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
+        }else if(cnt>=2){
+            break;
         }else{
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
