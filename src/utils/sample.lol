@@ -1,3 +1,6 @@
 HAI
-    ALL OF ALL OF 5 AN 6 AN 7 MKAY AN 8 ,SUM OF 5 AN 6
+    WTF?
+        OMG 1
+        OMG 2
+    OIC
 KTHXBYE

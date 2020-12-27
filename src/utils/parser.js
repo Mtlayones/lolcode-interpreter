@@ -723,7 +723,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber) => {
                 code[0].shift()
                 tableOfLexemes.push({value:",",description:"Command Line Break"});
             }
-        }else if(code[0][0] == "OIC" && default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OIC" && start_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             end = true;
