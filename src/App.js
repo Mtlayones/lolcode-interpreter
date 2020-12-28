@@ -25,7 +25,7 @@ function App() {
             <FirstFrame lolText={lolText} setLolText={setLolText} buttonEventClick={buttonEventClick} />
 
           <div className="secondFrame">
-            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick}/>
+            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick} setButtonEventClick={setButtonEventClick}/>
           </div>
 
           <div className="thirdFrame">
