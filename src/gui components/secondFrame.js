@@ -29,7 +29,7 @@ function SecondFrame(props){
 
     // Updates the parser for every change in the text in the first frame
     useEffect(() => {
-        if(!isInitialMount.current){
+        if(!isInitialMount.current == true){
             const parsedText = props.program_abs(props.lolText,[],1)
             console.log(typeof parsedText)
             // filters the newlines
@@ -50,7 +50,7 @@ function SecondFrame(props){
 
 
     // If the execute Button has not been pressed yet, display empty, else display the Table
-    return props.buttonEventClick === false? <Empty className = "secondFrameContent" description={description}/> : <Table className = "secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false} sticky = {true}/>
+    return props.buttonEventClick === false? <Empty className = "secondFrameContent" description={description}/> : <Table className = "secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>
 }
 
 export default SecondFrame
