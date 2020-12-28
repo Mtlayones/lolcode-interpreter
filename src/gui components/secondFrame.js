@@ -3,6 +3,7 @@ import { Table, Empty, Tag, Space } from 'antd'
 
 function SecondFrame(props){
     // Title for the colums
+    const [filteredLolCode, setfilteredLolCode] = useState('')
     const columns = [
         {
             title: 'Lexemes',
@@ -18,20 +19,21 @@ function SecondFrame(props){
 
     // component on Mount
     useEffect(() => {
-        console.log(props.parsedLol)
+        console.log(props.buttonEventClick)
     },[])
 
     // Updates the parser for every change in the text in the first frame
     useEffect(() => {
-        const hello = props.program_abs(props.lolText,[],1)
-        const test = hello[1]
+        const parsedText = props.program_abs(props.lolText,[],1)
+        const test = parsedText[1]
         // filters the newlines
         const filter = (typeof test != 'string') ? test.filter(x=> x.value != '\n') : null
-        console.log(filter)
-        props.setParsedLol(filter)
-    },[props.lolText])
+        setfilteredLolCode(filter)
+        props.setParsedLol(test)
+    },[props.buttonEventClick])
 
-    return props.parsedLol == 0? <Empty className = "secondFrameContent"/> : <Table className = "secondFrameContent" dataSource = {props.parsedLol} columns = {columns} width = {100}    pagination = {false} sticky = {true}/>
+    // If the execute Button has not been pressed yet, display empty, else display the Table
+    return props.buttonEventClick === false? <Empty className = "secondFrameContent"/> : <Table className = "secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false} sticky = {true}/>
 }
 
 export default SecondFrame

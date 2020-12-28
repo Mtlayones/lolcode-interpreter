@@ -12,6 +12,9 @@ function App() {
   const [lolText,setLolText] = useState('')
   // lolParser will contain the parsed data
   const [parsedLol,setParsedLol] = useState([])
+  // If a Button is clicked
+  const [buttonEventClick, setButtonEventClick] = useState(false)
+
 
   return (
     <div className="App">
@@ -19,10 +22,10 @@ function App() {
       <div className="mainWrapper">
       {/* First Row contains the First Frame and Second Frame (File Browser and Symbol Table) */}
         <div className="firstRow">
-            <FirstFrame lolText={lolText} setLolText={setLolText}/>
+            <FirstFrame lolText={lolText} setLolText={setLolText} buttonEventClick={buttonEventClick} />
 
           <div className="secondFrame">
-            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs}/>
+            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick}/>
           </div>
 
           <div className="thirdFrame">
@@ -31,7 +34,7 @@ function App() {
         </div>
         {/* The Second Row contains the Third Frame (Terminal) */}
         <div className="secondRow">
-            <FourthFrame lolText={lolText}/>
+            <FourthFrame setButtonEventClick={setButtonEventClick}/>
         </div>
         <div className="thirdRow">
           <div className="fifthFrame">
