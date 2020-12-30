@@ -4,7 +4,7 @@ import { CloseOutlined } from '@ant-design/icons'
 
 function ThirdFrame(props) {
     const isInitialMount = useRef(true);
-    const [description,setDescription] = useState("Nothing is getting parsed yet UwU")
+    const [description,setDescription] = useState("Nothing to Show Yet UwU")
 
     const columns = [
         {
