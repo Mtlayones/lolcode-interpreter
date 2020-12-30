@@ -653,7 +653,7 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 				if(error) return error;
 				line_number++;
 				break;
-			case 'Identifier': assignment_operation(code, symbol_table, lexicon, func_table, line_number);
+			case 'Identifier': assignment_operation(code, symbol_table, lexicon, func_table, line_number,handlePrefixChanges);
 				line_number++;
 				break;
 			case 'Output Keyword':
@@ -782,14 +782,14 @@ const switch_control = (symbol_table, lexicon, func_table, line_number,handlePre
 				to_compare = {value:value, type:type};
 				if((holder.type === to_compare.type) && (holder.value === to_compare.value))
 				{
-					error = execute_switch(symbol_table, lexicon, func_table ,line_number);
+					error = execute_switch(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 					if(!Array.isArray(error)) return error;
 					line_number = error[1];
 					to_break = true;
 				}
 				break;
 			case 'Case-Default Keyword':
-				error = execute_switch(symbol_table, lexicon, func_table ,line_number);
+				error = execute_switch(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 				if(!Array.isArray(error)) return error;
 				line_number = error[1];
 				to_break = true;
@@ -1157,7 +1157,7 @@ const program_start = (symbol_table,handlePrefixChanges) =>
 				line_number = error;
 				break;
 			case 'Loop Delimiter Keyword':
-				if(code.value === "IM IN") error = loop(symbol_table, lexicon, func_table ,line_number);
+				if(code.value === "IM IN") error = loop(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 				if(!Number.isInteger(error)) return error;
 				break;
 			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, func_table ,line_number,false,handlePrefixChanges);
@@ -1180,8 +1180,7 @@ const program_start = (symbol_table,handlePrefixChanges) =>
 	return lexicon
 }
 
-export default program_start;
-
+export { program_start, removeComments };
 // fs.readFile('./testcases/loop.lol', 'utf8', function(err, data){ 
 //     if(err) throw err;
 //     let error = syntax.parser(data,[],1);
