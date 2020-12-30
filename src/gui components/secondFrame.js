@@ -1,5 +1,6 @@
 import React, { useState,useEffect, useRef } from 'react';
 import { Table, Empty } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
 
 function SecondFrame(props){
     // Will be used to check if its the first time the app will be mounted. This will not trigger a render when changed
@@ -8,6 +9,8 @@ function SecondFrame(props){
     const [filteredLolCode, setfilteredLolCode] = useState('')
     // Will be used for the initial mount description and if there is a syntax error
     const [description, setDescription] = useState("We Have Nothing to Work On UwU")
+
+
     // Title for the colums
     const columns = [
         {
@@ -22,35 +25,51 @@ function SecondFrame(props){
         }
     ]
 
-    // component on Mount
-    useEffect(() => {
-        console.log(props.buttonEventClick)
-    },[])
-
     // Updates the parser for every change in the text in the first frame
     useEffect(() => {
-        if(!isInitialMount.current == true){
+        if(!isInitialMount.current){
+            console.log("LOL TEXT IS",props.lolText)
             const parsedText = props.program_abs(props.lolText,[],1)
-            console.log(typeof parsedText)
-            // filters the newlines
             if(Array.isArray(parsedText)){
                 const test = parsedText[1]
-                const filter = test.filter(x=> x.value != '\n')
+                console.log("parsedText")
+                const filter = test.filter(x=> x.value !== '\n')
                 setfilteredLolCode(filter)  
                 props.setParsedLol(test)
             }else if(typeof parsedText == 'string'){
                 setDescription(parsedText)
-                props.setButtonEventClick(false)
-                console.log("HERE")
             }
         }else{
             isInitialMount.current = false
         }
-    },[props.buttonEventClick])
+    },[props.lolText])
+    console.log("SECOND FRAME HERE")
+
 
 
     // If the execute Button has not been pressed yet, display empty, else display the Table
-    return props.buttonEventClick === false? <Empty className = "secondFrameContent" description={description}/> : <Table className = "secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>
+    if(props.buttonEventClick === false){
+         return(
+            <div className = "secondFrame">
+                <Empty description={description} />
+            </div>
+         )   
+    }else if (props.parsedLol.length === 0){
+        console.log("HERE at second frame",props.parsedLol)
+        return (
+            <div className = "secondFrame">
+             <CloseOutlined style={{fontSize: "25px"}}/>
+             <p style={{color:"darkred"}}>{description}</p>
+            </div>
+        )
+    }else{
+        return (
+            <div className="secondFrame">
+                <Table className ="secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>
+            </div>
+        )
+    }
+    
 }
 
 export default SecondFrame

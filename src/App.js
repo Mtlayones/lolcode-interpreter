@@ -4,8 +4,9 @@ import FirstFrame from './gui components/firstFrame';
 import SecondFrame from './gui components/secondFrame';
 import program_abs from './gui components/parser';
 import FourthFrame from './gui components/fourthFrame';
-
-
+import FifthFrame from './gui components/fifthFrame';
+import ThirdFrame from './gui components/thirdFrame'
+import program_start from './gui components/semantics';
 
 function App() {
   // lolText contains the text data only
@@ -14,6 +15,8 @@ function App() {
   const [parsedLol,setParsedLol] = useState([])
   // If a Button is clicked
   const [buttonEventClick, setButtonEventClick] = useState(false)
+  // for The Symbol Table
+  const [symbolTable, setSymbolTable] = useState([])
 
 
   return (
@@ -24,22 +27,17 @@ function App() {
         <div className="firstRow">
             <FirstFrame lolText={lolText} setLolText={setLolText} buttonEventClick={buttonEventClick} />
 
-          <div className="secondFrame">
-            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick} setButtonEventClick={setButtonEventClick}/>
-          </div>
+            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick}/>
 
-          <div className="thirdFrame">
-
-          </div>
+            <ThirdFrame buttonEventClick={buttonEventClick} symbolTable={symbolTable}></ThirdFrame>
         </div>
         {/* The Second Row contains the Third Frame (Terminal) */}
+
         <div className="secondRow">
             <FourthFrame setButtonEventClick={setButtonEventClick}/>
         </div>
         <div className="thirdRow">
-          <div className="fifthFrame">
-            UwU5
-          </div>
+            <FifthFrame symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} program_start={program_start} buttonEventClick={buttonEventClick}></FifthFrame>
 
         </div>
       </div>
