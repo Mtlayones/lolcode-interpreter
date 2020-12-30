@@ -5,8 +5,11 @@ import '../App.css';
 function FourthFrame(props) {
 
   const handleOnClick = (event) => {
-    props.setButtonEventClick(event.type)
+    // props.setParsedLol([])
+    // props.setSymbolTable([])
     console.log("BUTTON CLICKED")
+    props.setButtonClickCount(props.buttonClickCount+1)
+    console.log(props.buttonClickCount)
   }
 
   console.log("FOURTH FRAME HERE")

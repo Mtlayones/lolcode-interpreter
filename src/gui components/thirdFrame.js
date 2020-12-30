@@ -40,7 +40,7 @@ function ThirdFrame(props) {
 
     console.log("THIRD FRAME HERE")
 
-    if(props.buttonEventClick === false){
+    if(props.buttonClickCount===0){
          return(
             <div className = "thirdFrame">
                 <Empty description={description}/>

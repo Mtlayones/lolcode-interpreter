@@ -53,7 +53,7 @@ useEffect(() => {
     props.setLolText(localLolText)
     console.log("CHANGING THE VALUE OF LOL TEXT")
   }
-},[props.buttonEventClick])
+},[props.buttonClickCount])
 
 console.log("FIRST FRAME HERE")
 

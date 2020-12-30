@@ -13,10 +13,12 @@ function App() {
   const [lolText,setLolText] = useState('')
   // lolParser will contain the parsed data
   const [parsedLol,setParsedLol] = useState([])
-  // If a Button is clicked
-  const [buttonEventClick, setButtonEventClick] = useState(false)
   // for The Symbol Table
   const [symbolTable, setSymbolTable] = useState([])
+  // If a Button is clicked
+  const [buttonClickCount, setButtonClickCount] = useState(0)
+
+  
 
 
   return (
@@ -25,19 +27,19 @@ function App() {
       <div className="mainWrapper">
       {/* First Row contains the First Frame and Second Frame (File Browser and Symbol Table) */}
         <div className="firstRow">
-            <FirstFrame lolText={lolText} setLolText={setLolText} buttonEventClick={buttonEventClick} />
+            <FirstFrame lolText={lolText} setLolText={setLolText} buttonClickCount={buttonClickCount} />
 
-            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonEventClick={buttonEventClick}/>
+            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonClickCount={buttonClickCount}/>
 
-            <ThirdFrame buttonEventClick={buttonEventClick} symbolTable={symbolTable}></ThirdFrame>
+            <ThirdFrame buttonClickCount={buttonClickCount} symbolTable={symbolTable}></ThirdFrame>
         </div>
         {/* The Second Row contains the Third Frame (Terminal) */}
 
         <div className="secondRow">
-            <FourthFrame setButtonEventClick={setButtonEventClick}/>
+            <FourthFrame setButtonClickCount={setButtonClickCount} buttonClickCount={buttonClickCount}/>
         </div>
         <div className="thirdRow">
-            <FifthFrame symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} program_start={program_start} buttonEventClick={buttonEventClick}></FifthFrame>
+            <FifthFrame symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} program_start={program_start} ></FifthFrame>
 
         </div>
       </div>

@@ -48,7 +48,7 @@ function SecondFrame(props){
 
 
     // If the execute Button has not been pressed yet, display empty, else display the Table
-    if(props.buttonEventClick === false){
+    if(props.buttonClickCount === 0){
          return(
             <div className = "secondFrame">
                 <Empty description={description} />
