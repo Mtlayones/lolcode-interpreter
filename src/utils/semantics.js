@@ -331,7 +331,7 @@ const special_characters = (yarn, lexicon, line_number) =>
 	const reg_beep = /\:\o/g;
 	const reg_doublequote = /\:\'/g;
 	const reg_colon = /\:\:/g;
-	const reg_variable = /\:\{[a-z][a-z0-9]*\}/gi
+	const reg_variable = /\:\{[a-zA-Z][a-zA-Z0-9]*\}/g
 	const reg_error = /\:[^\:]/;
 
 	// if(reg_error.test(yarn) && reg_variable.test(yarn)) return `Error in line ${line_number}: escape character found without special character`;
