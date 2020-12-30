@@ -20,6 +20,8 @@ function FifthFrame(props) {
             isInitialMountFifthFrame.current = false
         }else{
             console.log("length of props lol",props.parsedLol.length)
+            // clear the terminal
+            prefixTextRef.current = ""
             if(props.parsedLol.length !== 0){
                 console.log("PARSED LOL IS")
                 // console.log([...props.parsedLol])
