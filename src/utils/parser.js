@@ -5,31 +5,30 @@ const literal = lexemes.literals
 const identifier = lexemes.identifier
 const types = lexemes.types
 
-// inline comment abstraction //optimized
+// inline comment abstraction //okay
 const inline_comment_abs = (code, tableOfLexemes,lineNumber)=>{
     code[0] = code[0].join(" ").trim().split(" ");
     let placeholder = code[0].shift();
-    tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]})
+    tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     // if there is comment after BTW
     if(code[0].length != 0){
-        placeholder = code[0].join(" ")
-        tableOfLexemes.push({value:placeholder,description:'Comment'}) 
+        placeholder = code[0].join(" ");
+        tableOfLexemes.push({value:placeholder,description:'Comment'});
         code[0] = [];
     }
     return [code, tableOfLexemes, lineNumber];
 }
 
-// multiline comment abstraction //optimized
+// multiline comment abstraction //okay
 const multiline_comment_abs = (code, tableOfLexemes, lineNumber) =>{
-    let placeholder = code[0].shift(),error;
-    tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]})
+    let placeholder = code[0].shift(),error,indexTLDR;
+    tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     // getting all the comment before the line of TLDR
     while(!code[0].includes('TLDR')){
-        placeholder = code[0].join(" ").trim();
+        placeholder = code.shift().join(" ").trim();
         if(placeholder != ""){
             tableOfLexemes.push({value:placeholder,description:'Comment'});
         }
-        code.shift();
         tableOfLexemes.push({value:'\n',description:'Line Break'});
         // if there is no TLDR present in the code
         if(code.length == 0) return `Syntax Error in line ${lineNumber}: Expected end of Multi-Line Comment.`;
@@ -39,29 +38,27 @@ const multiline_comment_abs = (code, tableOfLexemes, lineNumber) =>{
         [code, lineNumber] = error;
         lineNumber++;
     }
-    const indexTLDR = code[0].indexOf("TLDR");
+    indexTLDR = code[0].indexOf("TLDR");
     // if there is comment before TLDR
     if(indexTLDR != 0){
         placeholder = code[0].slice(0,indexTLDR).join(" ").trim();
         tableOfLexemes.push({value:placeholder,description:'Comment'});
     }
     tableOfLexemes.push({value:'TLDR',description:keywords['TLDR'][1]});
-    code[0] = code[0].slice(indexTLDR+1,code[0].length).join(" ").trim().split();
-    if(code[0][0] == '' && code[0].length ==1){
-        code[0].shift();
-    }
+    code[0] = code[0].slice(indexTLDR+1,code[0].length).join(" ").trim().split(" ");
     // if command line break encountered
     if(code[0].join(" ").trim().split(" ")[0] == ","){
         code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
+        tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
+    }if(code[0][0] == '' && code[0].length ==1){
+        code[0].shift();
     }
     return [code, tableOfLexemes, lineNumber];
 }
 
-// literal abstraction //optimized
+// literal abstraction //okay
 const literal_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder = code[0].shift(),change = true;
+    let placeholder = code[0].shift(),isChanged = true;
     if(literal["NUMBAR"][0].test(placeholder)){
         tableOfLexemes.push({value:placeholder, description: literal["NUMBAR"][1]});
     }else if(literal["NUMBR"][0].test(placeholder)){
@@ -72,76 +69,73 @@ const literal_abs = (code,tableOfLexemes,lineNumber) => {
         tableOfLexemes.push({value:placeholder, description: literal["TROOF"][1]});
     }else{
         code[0].unshift(placeholder);
-        change = false;
+        isChanged = false;
     }
-    return [code,tableOfLexemes, lineNumber,change];
+    // if command line break encountered
+    if(isChanged && code[0].join(" ").trim().split(" ")[0] == ","){
+        code[0] = code[0].join(" ").trim().split(" ");
+        tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
+    }
+    return [code,tableOfLexemes, lineNumber,isChanged];
 }
 
-// identifier abstraction //optimized
+// identifier abstraction //okay
 const identifier_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder;
-    placeholder = code[0].shift();
-    if(placeholder[0] == '\'' &&  placeholder[placeholder.length-1] == '\'' || placeholder[0] == '\'' ){
+    let placeholder = code[0].shift();
+    if(placeholder[0] == '\'' &&  placeholder[placeholder.length-1] == '\''){
+        // if there are string that were enclose by single quotes
         return `Syntax Error in line ${lineNumber}: Unexpected Sequence: ${placeholder}.`;
-    }else if(placeholder[0] == ',' || placeholder[placeholder.length-1] == ','){
-        return `Syntax Error in line ${lineNumber}: Invalid Operation: ${placeholder}.`;
     }else if(keywords[placeholder] || ["WIN","FAIL"].includes(placeholder) || !identifier[0].test(placeholder)){
+        // invalid format of the identifier
         return `Syntax Error in line ${lineNumber}: Expected Identifier: ${placeholder}.`;
     }else{
         tableOfLexemes.push({value:placeholder, description: identifier[1]});
     }
+    // if command line break encountered
+    if(code[0].join(" ").trim().split(" ")[0] == ","){
+        code[0] = code[0].join(" ").trim().split(" ");
+        tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
+    }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// operands abstraction
+// operands abstraction //okay
 const operands_abs = (code,tableOfLexemes,lineNumber,type) => {
-    let error,changed;
+    let error,isChanged;
     // literal
-    [code,tableOfLexemes, lineNumber, changed] = literal_abs(code,tableOfLexemes,lineNumber);
+    [code,tableOfLexemes, lineNumber, isChanged] = literal_abs(code,tableOfLexemes,lineNumber);
     // expression
-    if(!changed){
+    if(!isChanged){
         error = expression_abs(code,tableOfLexemes,lineNumber,type);
         // check if error
         if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber, changed] = error;
+        [code,tableOfLexemes, lineNumber, isChanged] = error;
     }
     // identifier
-    if(!changed){
+    if(!isChanged){
         error = identifier_abs(code,tableOfLexemes,lineNumber);
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// output abstraction //optimized
+// output abstraction //okay
 const output_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder = code[0].shift() , command = [], error;
+    let placeholder = code[0].shift() , error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     while(true){
-        if(tableOfLexemes[tableOfLexemes.length-1].value == "VISIBLE" && (code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0)){
+        if(tableOfLexemes[tableOfLexemes.length-1].value == "VISIBLE" && (code[0].join(" ").trim().split(" ")[0] == "," ||code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0)){
+            // missing operands after the VISIBLE KEYWORD
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
-        }else if(code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0){
+        }else if(code[0].join(" ").trim().split(" ")[0] == "BTW" || code[0].length == 0 || tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
             break;
         }else if(code[0].join(" ").trim().split(" ")[0] == "!"){
             // no new line encountered
             code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:"!",description:"No newline output"});
+            tableOfLexemes.push({value:code[0].shift(),description:"No newline output"});
             continue;
-        }else if(code[0].join(" ").trim().split(" ")[0] == "," && tableOfLexemes[tableOfLexemes.length-1].value != "VISIBLE"){
-            // command line break encountered
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
-            return [code,tableOfLexemes, lineNumber];
         }else if(tableOfLexemes[tableOfLexemes.length-1].value == "!" && code.length != 0){
             // if there is operation after ! beside inline comment
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
@@ -154,18 +148,16 @@ const output_abs = (code,tableOfLexemes,lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-        if(tableOfLexemes[tableOfLexemes.length-1].value == ","){
-            break;
-        }
     }
     return [code,tableOfLexemes, lineNumber];
 }
 
 // input abstraction //optimized
 const input_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder = code[0].shift(),command = "";
+    let placeholder = code[0].shift();
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
+        // missing operands after the GIMMEH KEYWORD
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
@@ -177,12 +169,6 @@ const input_abs = (code,tableOfLexemes,lineNumber) => {
     // check if error
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
@@ -191,6 +177,7 @@ const initialization_var_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
+        // missing operands after the ITZ KEYWORD
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
@@ -203,12 +190,6 @@ const initialization_var_abs = (code,tableOfLexemes,lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-        // if command line break encountered
-        if(code[0].join(" ").trim().split(" ")[0] == ","){
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
-        }
     }else{
         //operands
         error = operands_abs(code,tableOfLexemes,lineNumber, true);
@@ -219,11 +200,12 @@ const initialization_var_abs = (code,tableOfLexemes,lineNumber) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// variable declaration //optimized
+// variable declaration //okay
 const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift();
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
+        // missing operands after the I HAS A KEYWORD
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
@@ -235,24 +217,16 @@ const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
     // check if error   
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
-    tableOfLexemes[tableOfLexemes.length-1].description = "Variable Identifier";
+    tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break" ?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Variable Identifier";
     // if special IT identifier
-    if(tableOfLexemes[tableOfLexemes.length-1].value == "IT"){
-        placeholder = tableOfLexemes.pop();
-        return `Syntax Error in line ${lineNumber}: ${placeholder.value} is a Special Identifier.`;
+    if(tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break" ?tableOfLexemes.length-2:tableOfLexemes.length-1].value == "IT"){
+        return `Syntax Error in line ${lineNumber}: ${tableOfLexemes.pop().value} is a Special Identifier.`;
     }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-        return [code,tableOfLexemes, lineNumber];
-    }
-    if(code[0][0] == "ITZ"){
+    if(tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break" && code[0][0] == "ITZ"){
         // initialization
         error = initialization_var_abs(code,tableOfLexemes,lineNumber);
         // check if error
@@ -262,7 +236,7 @@ const declaration_var_abs = (code,tableOfLexemes,lineNumber) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// variable assignment //optimized
+// variable assignment //okay
 const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
     let placeholder;
     // identifier
@@ -270,6 +244,9 @@ const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
     // check if error
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
+    if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+        return `Syntax Error in line ${lineNumber}: Invalid Operation: ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+    }
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
@@ -281,6 +258,7 @@ const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
         return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
     }
     if(code[0].length == 0){
+        // missing operands after the R KEYWORD
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
     if(code[0][0] == ""){
@@ -303,11 +281,10 @@ const assignment_var_abs = (code,tableOfLexemes,lineNumber)=>{
     return [code,tableOfLexemes, lineNumber];
 }
 
-// arithmetic recursion //optimized
+// arithmetic recursion //okay
 const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
-    let placeholder = code[0].shift();
+    let placeholder = code[0].shift(),i,error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-    let i,error;
     for (i = 0; i < 3; i++){
         if(code[0].length == 0){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
@@ -322,7 +299,7 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             // check if error
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
-        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
         }else{
@@ -333,39 +310,36 @@ const arithmetic_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// boolean operations op abstraction  //optimized
+// boolean operations op abstraction  //okay
 const boolean_operands_abs = (code, tableOfLexemes, lineNumber, type) => {
-    let error, changed = false;
+    let error, isChanged = true;
     if(code[0][1] && keywords[[code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "Boolean"){
         // boolean operations
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
         error = boolean_recurse_abs(code,tableOfLexemes,lineNumber);
-        changed = true;
     }else if(code[0][0] == "NOT"){
         // not operations
         error = boolean_recurse_abs(code,tableOfLexemes,lineNumber);
-        changed = true;
     }else if(type && code[0][1] && keywords[[code[0][0],code[0][1]].join(" ")] && keywords[[code[0][0],code[0][1]].join(" ")][0] == "Boolean Many"){
         // boolean many operations
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
         error = boolean_many_recurse_abs(code,tableOfLexemes,lineNumber);
-        changed = true;
     }else if(keywords[code[0][0]] && keywords[code[0][0]][0] == 'Comparison'){
         // comparison different
         error = comparison_abs(code,tableOfLexemes,lineNumber);
-        changed = true;
     }else if(code[0][1]=="SAEM" && (keywords[[code[0][0],code[0][1]].join(" ")][0] == "Comparison")){
         // comparison same
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
         error = comparison_abs(code,tableOfLexemes,lineNumber);
-        changed = true;
+    }else{
+        isChanged = false;
     }
-    if(changed){
+    if(isChanged){
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
     }
-    return [code,tableOfLexemes, lineNumber,changed];
+    return [code,tableOfLexemes, lineNumber,isChanged];
 }
 
 // boolean recursion abstraction //optimized
@@ -400,7 +374,7 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
                 // check if error
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
-            }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+            }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
                 placeholder = code[0].shift();
                 tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             }else{
@@ -412,13 +386,16 @@ const boolean_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// boolean many recursion abstraction //optimized
+// boolean many recursion abstraction //okay
 const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt=0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     while(true){
         if(code[0].length == 0 && ["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }
+        if(cnt>=2 && (code[0].length == 0 || code[0].join(" ").trim().split(" ")[0] == "BTW" || tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break")){
+            break;
         }
         if(code[0][0] == ""){
             // if there is exceeding whitespace in between the operation
@@ -431,7 +408,7 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
             cnt ++;
-        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
         }else if(cnt>=2 && code[0][0] == "MKAY"){
@@ -440,20 +417,20 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
             break;
-        }else if(cnt>=2){
-            break;
         }else{
+            if(cnt < 2 && (code[0].length == 0 || code[0].join(" ").trim().split(" ")[0] == "BTW" || tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break")){
+                return `Syntax Error in line ${lineNumber}: Missing Operands after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+            }
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
     }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// comparison abstraction //optimized
+// comparison abstraction //okay
 const comparison_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),i, error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -471,7 +448,7 @@ const comparison_abs = (code,tableOfLexemes,lineNumber) => {
             // check if error
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
-        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
         }else{
@@ -482,9 +459,9 @@ const comparison_abs = (code,tableOfLexemes,lineNumber) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// expression abstraction //optimized
+// expression abstraction //okay
 const expression_abs = (code, tableOfLexemes, lineNumber, type) => {
-    let error,changed = true;
+    let error,isChanged = true;
     if(code[0][1] && keywords[[code[0][0],code[0][1]].join(" ")] && (keywords[[code[0][0],code[0][1]].join(" ")][0] == "Arithmetic")){
         // arithmetic
         code[0].unshift([code[0].shift(),code[0].shift()].join(" "));
@@ -510,12 +487,12 @@ const expression_abs = (code, tableOfLexemes, lineNumber, type) => {
         error = boolean_operands_abs(code,tableOfLexemes,lineNumber,type);
         // check if error
         if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber,changed] = error;
+        [code,tableOfLexemes, lineNumber,isChanged] = error;
     }
-    return [code,tableOfLexemes, lineNumber,changed]
+    return [code,tableOfLexemes, lineNumber,isChanged]
 }
 
-// concatenation abstraction //optimized
+// concatenation abstraction //okay
 const concat_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error,cnt = 0;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -524,9 +501,7 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
             // lacking operand after AN
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
-        if(cnt < 2 && code[0].join(" ").trim().split(" ")[0] == "BTW"){
-            return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
-        }else if(cnt >= 2 && tableOfLexemes[tableOfLexemes.length-1].value != "AN" && code[0].join(" ").trim().split(" ")[0] == "BTW" ){
+        if(cnt>=2 && (code[0].length == 0 || code[0].join(" ").trim().split(" ")[0] == "BTW" || tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break")){
             break;
         }
         if(code[0][0] == ""){
@@ -540,32 +515,29 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
             cnt++;
-        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0][0] == "AN" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-        }else{
-            if(code[0][0] == "MKAY" && cnt>=2){
-                placeholder = code[0].shift();
-                tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
-                // if command line break encountered
-                if(code[0].join(" ").trim().split(" ")[0] == ","){
-                    code[0] = code[0].join(" ").trim().split(" ");
-                    code[0].shift()
-                    tableOfLexemes.push({value:",",description:"Command Line Break"});
-                }
-                break;
-            }else if(cnt>=2){
-                break;
-            }else{
-                // if only one operand present
-                return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }else if(cnt>=2 && code[0][0] == "MKAY"){
+            placeholder = code[0].shift();
+            tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
+            // if command line break encountered
+            if(code[0].join(" ").trim().split(" ")[0] == ","){
+                code[0] = code[0].join(" ").trim().split(" ");
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
+            break;
+        }else{
+            if(cnt < 2 && (code[0].length == 0 || code[0].join(" ").trim().split(" ")[0] == "BTW" || tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break")){
+                return `Syntax Error in line ${lineNumber}: Missing Operands after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+            }
+            return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
         }
     }
     return [code,tableOfLexemes, lineNumber];
 } 
 
-// if else abstraction //optimized
+// if else abstraction //okay
 const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
     let placeholder = code[0].shift(), if_active = false,else_active = false,end=false,error;
     placeholder = placeholder.slice(0,placeholder.length-1);
@@ -574,8 +546,7 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
     // if command line break encountered
     if(code[0].join(" ").trim().split(" ")[0] == ","){
         code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
+        tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
     }
     while(!end){
         if(code.length == 0){
@@ -584,6 +555,9 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
         if(code[0].length == 0){
             // encounter new line
             code.shift();
+            if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                return `Syntax Error in line ${lineNumber}: Expected Statement after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`; 
+            }
             lineNumber++;
             tableOfLexemes.push({value:'\n',description:'Line Break'});
             if(code.length != 0){
@@ -597,17 +571,16 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
                 [code, lineNumber] = error;
             }
             continue;
-        }else if (code[0][1] && [code[0][0],code[0][1]].join(" ") == "YA RLY" && !if_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if (code[0][1] && [code[0][0],code[0][1]].join(" ") == "YA RLY" && !if_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = [code[0].shift(),code[0].shift()].join(" ");
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             if_active = true;
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
-        }else if(code[0][0] == "MEBBE" && if_active && !else_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "MEBBE" && if_active && !else_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             if(code[0].length == 0){
@@ -622,27 +595,25 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
             // check if error
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;   
-        }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "NO WAI" && if_active && !else_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "NO WAI" && if_active && !else_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = [code[0].shift(),code[0].shift()].join(" ");
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             else_active = true;
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
-        }else if(code[0][0] == "OIC" && if_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OIC" && if_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             end = true;
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
-        }else if(if_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(if_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             error = statement_abs(code,tableOfLexemes,lineNumber,type);
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
@@ -650,7 +621,7 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-        }else if(tableOfLexemes[tableOfLexemes.length - 1].value == "\n" && code[0][0] == 'OBTW'){
+        }else if(['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description) && code[0][0] == 'OBTW'){
             // multiline comment
             error = multiline_comment_abs(code,tableOfLexemes,lineNumber);
             if(!Array.isArray(error)) return error;
@@ -658,7 +629,7 @@ const if_else_abs = (code,tableOfLexemes,lineNumber,type) => {
         }else if(code[0].length != 0 && !if_active){
             // if there is no if
             return `Syntax Error in line ${lineNumber}: Expected start of Flow Control: ${code[0].join(" ").trim()}.`;
-        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
         }
@@ -675,8 +646,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
     // if command line break encountered
     if(code[0].join(" ").trim().split(" ")[0] == ","){
         code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
+        tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
     }
     while(!end){
         if(code.length == 0){
@@ -685,6 +655,9 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
         if(code[0].length == 0){
             // encounter new line
             code.shift();
+            if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                return `Syntax Error in line ${lineNumber}: Expected Statement after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`; 
+            }
             lineNumber++;
             tableOfLexemes.push({value:'\n',description:'Line Break'});
             if(code.length != 0){
@@ -698,7 +671,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
                 [code, lineNumber] = error;
             }
             continue;
-        }else if(code[0][0] == "OMG" && !default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OMG" && !default_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             if(code[0].length == 0){
@@ -721,27 +694,25 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
             }
             listOfOptions.push(tableOfLexemes[indexConstant].value);
             start_active = true;   
-        }else if(code[0][0] == "OMGWTF" && start_active && !default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OMGWTF" && start_active && !default_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             default_active = true;
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
-        }else if(code[0][0] == "OIC" && start_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "OIC" && start_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             end = true;
             // if command line break encountered
             if(code[0].join(" ").trim().split(" ")[0] == ","){
                 code[0] = code[0].join(" ").trim().split(" ");
-                code[0].shift()
-                tableOfLexemes.push({value:",",description:"Command Line Break"});
+                tableOfLexemes.push({value:code[0].shift(),description:"Command Line Break"});
             }
-        }else if(start_active || default_active && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(start_active || default_active && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             error = statement_abs(code,tableOfLexemes,lineNumber,type=="Function"? type:"Block Operations");
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
@@ -749,13 +720,13 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-        }else if(["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value) && code[0][0] == 'OBTW'){
+        }else if(['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description) && code[0][0] == 'OBTW'){
             error = multiline_comment_abs(code,tableOfLexemes,lineNumber);
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
         }else if(code[0].length != 0 && !start_active){
             return `Syntax Error in line ${lineNumber}: Expected start of Flow Control: ${code[0].join(" ").trim()}.`;
-        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
         }
@@ -763,7 +734,7 @@ const switch_case_abs = (code,tableOfLexemes,lineNumber,type) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// loop abstraction
+// loop abstraction //okay
 const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
     let placeholder = code[0].shift(),error,end=false,loopName='';
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -783,8 +754,11 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
-        loopName = tableOfLexemes[tableOfLexemes.length-1].value;
-        tableOfLexemes[tableOfLexemes.length-1].description = "Loop Identifier";
+        loopName = tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].value;
+        tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Loop Identifier";
+        if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+            return `Syntax Error in line ${lineNumber}: Invalid Operation: ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+        }
         if(code[0].length == 0){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
@@ -812,7 +786,10 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
                 // check if error
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
-                tableOfLexemes[tableOfLexemes.length-1].description = "Parameter Identifier";
+                tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Parameter Identifier";
+                if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                    return `Syntax Error in line ${lineNumber}: Invalid Operation: ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
+                }
                 // the conditionals in the loop
                 if(code[0][0] == "TIL" | code[0][0] == "WILE"){
                     placeholder = code[0].shift();
@@ -838,6 +815,9 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
                         if(code[0].length == 0){
                             // encounter new line
                             code.shift();
+                            if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                                return `Syntax Error in line ${lineNumber}: Expected Statement after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`; 
+                            }
                             lineNumber++;
                             tableOfLexemes.push({value:'\n',description:'Line Break'});
                             if(code.length != 0){
@@ -851,7 +831,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
                                 [code, lineNumber] = error;
                             }
                             continue;
-                        }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IM OUTTA" && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+                        }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IM OUTTA" && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
                             // loop code delimiter
                             placeholder = [code[0].shift(),code[0].shift()].join(' ');
                             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -884,14 +864,8 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
                             }else{
                                 return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
                             }
-                            // if command line break encountered
-                            if(code[0].join(" ").trim().split(" ")[0] == ","){
-                                code[0] = code[0].join(" ").trim().split(" ");
-                                code[0].shift()
-                                tableOfLexemes.push({value:",",description:"Command Line Break"});
-                            }
                             end = true
-                        }else if(["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+                        }else if(['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
                             // body of the loop
                             error = statement_abs(code,tableOfLexemes,lineNumber,type=="Function"? type:"Block Operations");
                             if(!Array.isArray(error)) return error;
@@ -900,7 +874,7 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
                         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
                             // inline comment
                             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-                        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+                        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
                             // if there is operation after the identifier
                             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
                         }
@@ -920,8 +894,8 @@ const loop_abs = (code, tableOfLexemes, lineNumber,type) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
-// function  abstraction
-const function_abs = (code, tableOfLexemes, lineNumber, type) => {
+// function  abstraction //okay
+const function_abs = (code, tableOfLexemes, lineNumber) => {
     let placeholder = code[0].shift(),error,end=false;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
     if(code[0].length == 0){
@@ -936,8 +910,11 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
     // check if error
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
-    tableOfLexemes[tableOfLexemes.length-1].description = "Function Identifier";
+    tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Function Identifier";
     while(true){
+        if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+            break;
+        }
         if(code[0][0] == "" && !["BTW",","].includes(code[0].join(" ").trim().split(" ")[0])){
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
@@ -957,7 +934,7 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
                 // check if error
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
-                tableOfLexemes[tableOfLexemes.length-1].description = "Parameter Identifier";
+                tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Parameter Identifier";
             }else{
                 if(tableOfLexemes[tableOfLexemes.length-1].value == "AN"){
                     return `Syntax Error in line ${lineNumber}: Missing Operands ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
@@ -972,12 +949,6 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
             break;
         }
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     // body of the function
     while(!end){
         if(code.length == 0){
@@ -986,6 +957,9 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
         if(code[0].length == 0){
             // encounter new line
             code.shift();
+            if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                return `Syntax Error in line ${lineNumber}: Expected Statement after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`; 
+            }
             lineNumber++;
             tableOfLexemes.push({value:'\n',description:'Line Break'});
             if(code.length != 0){
@@ -999,7 +973,7 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
                 [code, lineNumber] = error;
             }
             continue;
-        }else if(code[0][3] && [code[0][0],code[0][1],code[0][2],code[0][3]].join(" ") == "IF U SAY SO" && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][3] && [code[0][0],code[0][1],code[0][2],code[0][3]].join(" ") == "IF U SAY SO" && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             // loop code delimiter
             placeholder = [code[0].shift(),code[0].shift(),code[0].shift(),code[0].shift()].join(' ');
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -1010,7 +984,7 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
                 tableOfLexemes.push({value:",",description:"Command Line Break"});
             }
             end = true
-        }else if(["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             // body of the loop
             error = statement_abs(code,tableOfLexemes,lineNumber, 'Function');
             if(!Array.isArray(error)) return error;
@@ -1019,7 +993,7 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
         }
@@ -1027,6 +1001,7 @@ const function_abs = (code, tableOfLexemes, lineNumber, type) => {
     return [code,tableOfLexemes, lineNumber];
 }
 
+// function call abstraction //okay
 const function_call_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -1042,8 +1017,11 @@ const function_call_abs = (code,tableOfLexemes,lineNumber) => {
     // check if error
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
-    tableOfLexemes[tableOfLexemes.length-1].description = "Function Identifier";
+    tableOfLexemes[tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"?tableOfLexemes.length-2:tableOfLexemes.length-1].description = "Function Identifier";
     while(true){
+        if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+            break;
+        }
         if(code[0][0] == "" && !["BTW",","].includes(code[0].join(" ").trim().split(" ")[0])){
             // if there is exceeding whitespace in between the operation
             return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
@@ -1085,36 +1063,22 @@ const function_call_abs = (code,tableOfLexemes,lineNumber) => {
             break;
         }
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// statement abstraction //optimized
-const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
+// statement abstraction //okay
+const statement_abs = (code,tableOfLexemes,lineNumber,type) => {
+    let error,isChanged = true;
     let placeholder;
-    let error,changed = true;
-    [code,tableOfLexemes, lineNumber, changed] = literal_abs(code,tableOfLexemes,lineNumber);
-    if(!changed){
+    [code,tableOfLexemes, lineNumber, isChanged] = literal_abs(code,tableOfLexemes,lineNumber);
+    if(!isChanged){
         error = expression_abs(code,tableOfLexemes,lineNumber, true);
         // check if error
         if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber, changed] = error;
+        [code,tableOfLexemes, lineNumber, isChanged] = error;
     }
-    if(changed){
-        // if command line break encountered
-        if(code[0].join(" ").trim().split(" ")[0] == ","){
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
-        }
-    }
-    if(!changed){
-        changed = true;
+    if(!isChanged){
+        isChanged = true;
         if(code[0][0] == "BTW"){
             error = inline_comment_abs(code,tableOfLexemes,lineNumber);
         }else if(code[0][0] == "OBTW"){
@@ -1136,7 +1100,7 @@ const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
             error = loop_abs(code,tableOfLexemes,lineNumber,type);
         }else if(code[0][2] && keywords[[code[0][0],code[0][1],code[0][2]].join(" ")] && (keywords[[code[0][0],code[0][1],code[0][2]].join(" ")][0] == "Function")){
             code[0].unshift([code[0].shift(),code[0].shift(),code[0].shift()].join(" "));
-            error = function_abs(code,tableOfLexemes,lineNumber,type);
+            error = function_abs(code,tableOfLexemes,lineNumber);
         }else if(code[0][0] == "WTF?"){
             error = switch_case_abs(code,tableOfLexemes,lineNumber,type);
         }else if(code[0][0] == "MAEK"){
@@ -1145,10 +1109,14 @@ const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
             error = typecast_var_abs(code,tableOfLexemes,lineNumber);
         }else if(["TLDR","OIC"].includes(code[0][0])){
             return `Syntax Error in line ${lineNumber}: Expected Starting Flow-Control Structure: ${code[0].join(" ").trim()}.`;
+        }else if(code[0][3] && [code[0][0],code[0][1],code[0][2],code[0][3]].join(" ") == "IF U SAY SO"){
+            return `Syntax Error in line ${lineNumber}: Expected Starting Function Structure: ${code[0].join(" ").trim()}.`;
+        }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IM OUTTA"){
+            return `Syntax Error in line ${lineNumber}: Expected Starting Loop Structure: ${code[0].join(" ").trim()}.`;
         }else{
-            changed = false;
+            isChanged = false;
         }
-        if(changed){
+        if(isChanged){
             // check if error
             if(!Array.isArray(error)) return error;
             [code,tableOfLexemes, lineNumber] = error;
@@ -1157,9 +1125,9 @@ const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
             }
         }
     }
-    if(!changed && (type == "Function" || type == "Block Operations")){
-        changed = true;
-        if(type == "Function" && code[0][0] == "FOUND" && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+    if(!isChanged && (type == "Function" || type == "Block Operations")){
+        isChanged = true;
+        if(type == "Function" && code[0][0] == "FOUND" && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             // loop code delimiter
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -1186,38 +1154,32 @@ const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
                 if(!Array.isArray(error)) return error;
                 [code,tableOfLexemes, lineNumber] = error;
             }
-        }else if(code[0][0] == "GTFO" && ["\n",","].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
+        }else if(code[0][0] == "GTFO" && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description)){
             // break code delimiter
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
+            // if command line break encountered
+            if(code[0].join(" ").trim().split(" ")[0] == ","){
+                code[0] = code[0].join(" ").trim().split(" ");
+                code[0].shift()
+                tableOfLexemes.push({value:",",description:"Command Line Break"});
+            }
         }else{
-            changed = false;
-        }
-        // if command line break encountered
-        if(code[0].join(" ").trim().split(" ")[0] == "," && changed){
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
+            isChanged = false;
         }
     }
-    if(!changed){
+    if(!isChanged){
         // identifier
         error = identifier_abs(code,tableOfLexemes,lineNumber);
         // check if error
         if(!Array.isArray(error)) return error;
-        [code,tableOfLexemes, lineNumber] = error;
-        // if command line break encountered
-        if(code[0].join(" ").trim().split(" ")[0] == ","){
-            code[0] = code[0].join(" ").trim().split(" ");
-            code[0].shift()
-            tableOfLexemes.push({value:",",description:"Command Line Break"});
-        }            
+        [code,tableOfLexemes, lineNumber] = error;      
     }
     if(code[0].length != 0){
         if(code[0].join(" ").trim().split(" ")[0] == "BTW"){
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
-        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+        }else if(code[0].length != 0 && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
             // if there is operation after the identifier
             return `Syntax Error in line ${lineNumber}: Expected end of Expression: ${code[0].join(" ").trim()}.`;
         }
@@ -1225,7 +1187,7 @@ const statement_abs = (code,tableOfLexemes,lineNumber, type) => {
     return [code,tableOfLexemes, lineNumber]; 
 }
 
-// type casting of expression //optimized
+// type casting of expression //okay
 const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
     let placeholder = code[0].shift(),error;
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -1242,7 +1204,7 @@ const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
     if(!Array.isArray(error)) return error;
     [code,tableOfLexemes, lineNumber] = error;
     // typecasting to data type
-    if(code[0][0] == "A" && tableOfLexemes[tableOfLexemes.length-1].value != ","){
+    if(code[0][0] == "A" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
         //type init
         error = type_init_abs(code,tableOfLexemes,lineNumber);
         // check if error
@@ -1251,16 +1213,10 @@ const typecast_expr_abs = (code, tableOfLexemes, lineNumber) =>{
     }else{
         return `Syntax Error in line ${lineNumber}: Missing Operands ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
     }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
-    }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// type casting of var
+// type casting of var //okay
 const typecast_var_abs = (code,tableOfLexemes,lineNumber) => {
     let placeholder;
     // identifier
@@ -1271,7 +1227,7 @@ const typecast_var_abs = (code,tableOfLexemes,lineNumber) => {
     if(code[0][0] == ""){
         // if there is exceeding whitespace in between the operation
         return `Syntax Error in line ${lineNumber}: Exceeding whitespace.`;
-    }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IS NOW"){
+    }else if(code[0][1] && [code[0][0],code[0][1]].join(" ") == "IS NOW" && tableOfLexemes[tableOfLexemes.length-1].description != "Command Line Break"){
         placeholder = [code[0].shift(),code[0].shift()].join(' ');
         tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});  
     }else{
@@ -1285,19 +1241,14 @@ const typecast_var_abs = (code,tableOfLexemes,lineNumber) => {
         // check if error
         if(!Array.isArray(error)) return error;
         [code,tableOfLexemes, lineNumber] = error;
+
     }else{
         return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length - 1].value}.`;
-    }
-    // if command line break encountered
-    if(code[0].join(" ").trim().split(" ")[0] == ","){
-        code[0] = code[0].join(" ").trim().split(" ");
-        code[0].shift()
-        tableOfLexemes.push({value:",",description:"Command Line Break"});
     }
     return [code,tableOfLexemes, lineNumber];
 }
 
-// type initialization abstraction //optimized
+// type initialization abstraction //okay
 const type_init_abs = (code, tableOfLexemes,lineNumber) => {
     let placeholder = code[0].shift();
     tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
@@ -1312,6 +1263,11 @@ const type_init_abs = (code, tableOfLexemes,lineNumber) => {
         // data types
         placeholder = code[0].shift();
         tableOfLexemes.push({value:placeholder,description:types[placeholder][1]});
+        // if command line break encountered
+        if(code[0].join(" ").trim().split(" ")[0] == ","){
+            code[0] = code[0].join(" ").trim().split(" ");
+            tableOfLexemes.push({value: code[0].shift(),description:"Command Line Break"});
+        }
     }else{
         return `Syntax Error in line ${lineNumber}: Expected Data Type`;
     }
@@ -1337,7 +1293,7 @@ const tokenizer_abs = (code,lineNumber) => {
         if(item[0] == '\"' && item[item.length-1] == '\"'){
             tempHolder.push(item);
         }else{
-            let temp_array = item.replace(/[\,]/g, " ,").replace(/[\!]/g, " !").trim().replace(/[\!]/g, "! ").replace(/[\,]/g, ", ").trim().split(" ");
+            let temp_array = item.replace(/[\,]/g, " ,").replace(/[\!]/g, " !").trim().replace(/[\!](?=[^\ ])/g, "! ").replace(/[\,](?=[^\ ])/g, ", ").trim().split(" ");
             if(item[0] == '\"'){
                 const index1 = temp_array.findIndex((word)=>literal["YARN1"][0].test(word));
                 if(index1 != -1){
@@ -1359,9 +1315,6 @@ const tokenizer_abs = (code,lineNumber) => {
 const program_abs = (code,tableOfLexemes,lineNumber) =>{
     let start = false, end = false,placeholder,error;
     code = code.split("\n");
-    // if(code.length == 1 && code[0] == ''){
-    //     return [code,tableOfLexemes, lineNumber]; 
-    // }
     while(code.length !=0){
         if(!Array.isArray(code[0])){
             // new line of code encountered
@@ -1379,6 +1332,9 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
         }else if(code[0].length == 0){
             // if new line encountered
             code.shift();
+            if(tableOfLexemes[tableOfLexemes.length-1].description == "Command Line Break"){
+                return `Syntax Error in line ${lineNumber}: Expected Statement after: ${tableOfLexemes[tableOfLexemes.length-1].value}.`; 
+            }
             lineNumber++;
             tableOfLexemes.push({value:'\n',description:'Line Break'});
             continue;
@@ -1387,7 +1343,7 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
             // inline comment
             [code,tableOfLexemes, lineNumber] = inline_comment_abs(code,tableOfLexemes,lineNumber);
             continue;
-        }else if((!start || (end && tableOfLexemes[tableOfLexemes.length-1].value == "\n")) && code[0][0] == 'OBTW'){
+        }else if((!start || (end && ['Line Break','Command Line Break'].includes(tableOfLexemes[tableOfLexemes.length-1].description))) && code[0][0] == 'OBTW'){
             // multiline comment
             error = multiline_comment_abs(code,tableOfLexemes,lineNumber);
             if(!Array.isArray(error)) return error;
@@ -1398,7 +1354,7 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             start = true;
-        }else if(start && code[0][0] == "KTHXBYE"){
+        }else if(start && !end && code[0][0] == "KTHXBYE"){
             placeholder = code[0].shift();
             tableOfLexemes.push({value:placeholder,description:keywords[placeholder][1]});
             end = true;
@@ -1419,5 +1375,8 @@ const program_abs = (code,tableOfLexemes,lineNumber) =>{
     return [code,tableOfLexemes, lineNumber]; 
 }
 
+// fs.readFile('./sample.lol', 'utf8', function(err, data){ 
+//     console.log(program_abs(data,[],1));
+// }); 
 
-export default program_abs
+export default program_abs;
