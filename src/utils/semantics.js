@@ -1,24 +1,10 @@
-<<<<<<< HEAD
-const fs = require('fs');
-const syntax = require('./parser.js')
-const numbar_regex = /^(-?\d*.?\d+)$/g
-const numbr_regex = /^(-?\d+)$/g
-=======
-/* eslint-disable default-case */
-/* eslint-disable no-fallthrough */
-/* eslint-disable no-useless-escape */
 import { literal } from './lexemes';
->>>>>>> ui
 // javascript has to float, they use number instead of
 // integers and float
 
 // a function that removes the comments and
 // comment keyword identifiers in the symbol table
-<<<<<<< HEAD
-const removeComments = (symbol_table) =>
-=======
 export const removeComments = (symbol_table) =>
->>>>>>> ui
 {
 	for (var i = 0; i<symbol_table.length; i++)
 	{
@@ -36,11 +22,7 @@ export const removeComments = (symbol_table) =>
 
 // a function that recursively executes the line until it reaches a new line,
 // enough operands is met, or MKAY is encountered
-<<<<<<< HEAD
-const recursive_operations = (code,symbol_table, lexicon, line_number) => 
-=======
 const recursive_operations = (code,symbol_table, lexicon, func_table, line_number,handlePrefixChanges) => 
->>>>>>> ui
 {
 	let cur_code = symbol_table.shift(); // gets the first element in the symbol table
 	let value; // variable for storing value of operand
@@ -48,13 +30,6 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 	let type; // variable for storing the data type of the operand
 	let req_ops = 2; // variable for checking the number of operands required, default is 2
 	let to_break = false; // variable for checking if MKAY is encountered
-<<<<<<< HEAD
-	const req_op_1 = ["NOT", "ITZ", "MEBBE", "R", "OMG"];
-	if (req_op_1.indexOf(code.value) > -1) req_ops = 1; // not requires only 1 operand
-	else if (code.value == "ANY OF" || code.value == "ALL OF") req_ops = -1; // infinite operands
-
-	while(cur_code.value != "\n" && cur_code.value != ",")
-=======
 	const req_op_1 = ["NOT", "ITZ", "MEBBE", "R", "OMG", "FOUND"];
 	const no_req = ["ALL OF", "ANY OF", "SMOOSH", "I IZ"];
 	const literals = ["NUMBR Literal", "NUMBAR Literal", "YARN Literal", "TROOF Literal"];
@@ -72,7 +47,6 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 	else if (no_req.indexOf(code.value) > -1) req_ops = -1; // infinite operands
 
 	while(cur_code.value !== "\n" && cur_code.value !== ",")
->>>>>>> ui
 	{
 		switch(cur_code.description)
 		{
@@ -80,17 +54,6 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 				break;
 			case "NUMBAR Literal": operands.push({value:Number(cur_code.value), type:"NUMBAR", name: "Literal"});
 				break;
-<<<<<<< HEAD
-			case "YARN Literal": operands.push({value:cur_code.value, type:"YARN"});
-				break;
-			case "TROOF Literal": operands.push({value:cur_code.value, type:"TROOF"});
-				break;
-			case "Type Keyword": cur_code = symbol_table.shift();
-				operands.push({value:undefined, type:cur_code.value});
-				break;
-			case "Identifier": 
-				if(cur_code.value == "NOOB")
-=======
 			case "YARN Literal": operands.push({value:cur_code.value.slice(1,-1), type:"YARN", name: "Literal"});
 				break;
 			case "TROOF Literal": operands.push({value:cur_code.value, type:"TROOF", name: "Literal"});
@@ -100,37 +63,19 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 				break;
 			case "Identifier": 
 				if(cur_code.value === "NOOB")
->>>>>>> ui
 				{
 					operands.push({value:undefined, type:"NOOB"})
 					break;
 				}
-<<<<<<< HEAD
-				var i;
-				for (i=0; i<lexicon.length; i++)
-				{
-					if(lexicon[i].name == cur_code.value)
-=======
 				let i;
 				for (i=0; i<lexicon.length; i++)
 				{
 					if(lexicon[i].name === cur_code.value)
->>>>>>> ui
 					{
 						operands.push({value:lexicon[i].value, type:lexicon[i].type,name:lexicon[i].name});
 						break;
 					}
 				}
-<<<<<<< HEAD
-				if (i == lexicon.length) return `Error in line ${line_number}: variable ${cur_code.value} is undeclared`;
-				break;
-			case "Infinite Delimiter Keyword": to_break = true;
-			case "Operand Delimiter Keyword": break;
-			case "AND Delimiter Operation Keyword":
-			case "OR Delimiter Operation Keyword": return `Error in line ${line_number}: ${cur_code.value} cannot be nested in operations`;
-			default:
-				error = recursive_operations(cur_code, symbol_table, lexicon, line_number);
-=======
 				if (i === lexicon.length) return `Error in line ${line_number}: variable ${cur_code.value} is undeclared`;
 				break;
 			case 'Function Identifier': operands.push(cur_code.value);
@@ -140,17 +85,10 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 			case "Operand Delimiter Keyword": break;
 			default:
 				error = recursive_operations(cur_code, symbol_table, lexicon, func_table, line_number,handlePrefixChanges);
->>>>>>> ui
 				if(!Array.isArray(error)) return error;
 				[value, type] = error;
 				operands.push({value:value, type:type});
 		}
-<<<<<<< HEAD
-		if (req_ops == operands.length || to_break) break;
-		cur_code = symbol_table.shift();
-	}
-	if(req_ops == operands.length || to_break)
-=======
 		if (req_ops === operands.length || to_break) break;
 		cur_code = symbol_table.shift();
 	}
@@ -158,18 +96,10 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 	if(cur_code.value === "\n") symbol_table.unshift(cur_code);
 
 	if(req_ops === operands.length || to_break)
->>>>>>> ui
 	{
 		const arith = ["SUM OF", "DIFF OF", "PRODUKT OF", "QUOSHUNT OF", "MOD OF", "BIGGR OF", "SMALLR OF"];
 		const bool = ["BOTH OF", "EITHER OF", "WON OF", "NOT", "ALL OF", "ANY OF"];
 		const comparison = ["BOTH SAEM", "DIFFRINT"];
-<<<<<<< HEAD
-		if(arith.indexOf(code.value) >-1) return arithmetic_operations(code.value,operands,line_number,symbol_table);
-		else if (bool.indexOf(code.value) > -1) return boolean_operations(code.value,operands, line_number,symbol_table);
-		else if (comparison.indexOf(code.value) > -1) return comparison_operations(code.value,operands, line_number,symbol_table);
-		return [operands[0].value, operands[0].type];
-	}
-=======
 
 		if(arith.indexOf(code.value) >-1) return arithmetic_operations(code.value,operands,line_number);
 		else if (bool.indexOf(code.value) > -1) return boolean_operations(code.value,operands, line_number);
@@ -180,33 +110,15 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 		return [operands[0].value, operands[0].type];
 	}
 	else if (code.value === "SMOOSH") return SMOOSH(operands, line_number);
->>>>>>> ui
 	else if(operands.length < req_ops) return `Error in line ${line_number}: function ${code.value} requires ${req_ops} operands, only received ${operands.length} operands`;
 	else return `Error in line ${line_number}: ${code.value} expecting MKAY keyword at the end`;
 }
 
-<<<<<<< HEAD
-const arithmetic_operations = (code, operands, line_number, symbol_table) =>
-=======
 const arithmetic_operations = (code, operands, line_number) =>
->>>>>>> ui
 {
 	let i = 0;
 	for (i; i<2; i++)
 	{
-<<<<<<< HEAD
-		if (operands[i].type == "NOOB") return `Error in line ${line_number}: NOOB value cannot by implicitly typecasted into a NUMBR/NUMBAR`;
-		else if (operands[i].type != "NOOB" && operands[i].value == undefined) return `Error in line ${line_number}: variable ${operands[i].name} is uninitialized before use`;
-		else if (operands[i].type == "TROOF")
-		{
-			operands[i].value = (operands[i].value == "WIN")? 1: 0;
-			operands[i].type = "NUMBR";
-		}
-		if (operands[i].type == "YARN")
-		{
-			const check = operands[i].value.replace(/"/g, '');
-			if (numbar_regex.test(check))
-=======
 		if (operands[i].type === "NOOB") return `Error in line ${line_number}: NOOB value cannot by implicitly typecasted into a NUMBR/NUMBAR`;
 		else if (operands[i].type !== "NOOB" && operands[i].value === undefined) return `Error in line ${line_number}: variable ${operands[i].name} is uninitialized before use`;
 		else if (operands[i].type === "TROOF")
@@ -218,27 +130,17 @@ const arithmetic_operations = (code, operands, line_number) =>
 		{
 			const check = operands[i].value;
 			if (literal['NUMBAR'][0].test(check))
->>>>>>> ui
 			{
 				operands[i].value = Number(check);
 				operands[i].type = "NUMBAR";
 			}
-<<<<<<< HEAD
-			else if (numbr_regex.test(check))
-=======
 			else if (literal['NUMBR'][0].test(check))
->>>>>>> ui
 			{
 				operands[i].value = Number(check);
 				operands[i].type = "NUMBR";
 			}
 			else return `Error in line ${line_number}: ${operands[i].value} cannot be typecasted into a NUMBR or a NUMBR`;
-<<<<<<< HEAD
-		}
-			
-=======
 		}	
->>>>>>> ui
 	}
 
 	const op1 = operands.shift();
@@ -246,17 +148,6 @@ const arithmetic_operations = (code, operands, line_number) =>
 
 	let result;
 	let type;
-<<<<<<< HEAD
-	if (code == "SUM OF") result = op1.value + op2.value;
-	else if (code == "DIFF OF") result = op1.value - op2.value;
-	else if (code == "PRODUKT OF") result = op1.value * op2.value;
-	else if (code == "QUOSHUNT OF") result = op1.value / op2.value;
-	else if (code == "MOD OF") result = op1.value % op2.value;
-	else if (code == "BIGGR OF") result = Math.max(op1.value,op2.value);
-	else result = Math.min(op1.value,op2.value);
-
-	if(op1.type == "NUMBAR" || op2.type == "NUMBAR") type = "NUMBAR";
-=======
 	if (code === "SUM OF") result = op1.value + op2.value;
 	else if (code === "DIFF OF") result = op1.value - op2.value;
 	else if (code === "PRODUKT OF") result = op1.value * op2.value;
@@ -266,7 +157,6 @@ const arithmetic_operations = (code, operands, line_number) =>
 	else result = Math.min(op1.value,op2.value);
 
 	if(op1.type === "NUMBAR" || op2.type === "NUMBAR") type = "NUMBAR";
->>>>>>> ui
 	else
 	{
 		result = Math.floor(result);
@@ -275,26 +165,6 @@ const arithmetic_operations = (code, operands, line_number) =>
 	return [result, type];
 }
 
-<<<<<<< HEAD
-const boolean_operations = (code, operands, line_number, symbol_table) =>
-{
-	let i;
-	for (i = 0; i<operands.length; i++){
-		if(operands[i].type != "TROOF")
-		{
-			let name = (operands[i].name != undefined)? operands[i].name : "";
-			operands[i].value = typecast_to_TROOF(operands[i].value, operands[i].type, name, line_number);
-			if (operands[i].value != "WIN" && operands[i].value != "FAIL") return operands[i].value;
-		}
-	}
-	let result;
-	if (code == "NOT")
-	{
-		const op1 = operands.shift();
-		result = (op1.value == "WIN")? "FAIL" : "WIN";
-	}
-	else if (code == "ALL OF")
-=======
 const boolean_operations = (code, operands, line_number) =>
 {
 	let i;
@@ -315,36 +185,23 @@ const boolean_operations = (code, operands, line_number) =>
 		result = (op1.value === "WIN")? "FAIL" : "WIN";
 	}
 	else if (code === "ALL OF")
->>>>>>> ui
 	{
 		result = "WIN";
 		for(i = 0; i<operands.length; i++)
 		{
-<<<<<<< HEAD
-			if(operands[i].value == "FAIL")
-=======
 			if(operands[i].value === "FAIL")
->>>>>>> ui
 			{
 				result = "FAIL";
 				break;
 			}
 		}
 	}
-<<<<<<< HEAD
-	else if (code == "ANY OF")
-=======
 	else if (code === "ANY OF")
->>>>>>> ui
 	{
 		result = "FAIL";
 		for(i = 0; i<operands.length; i++)
 		{
-<<<<<<< HEAD
-			if(operands[i].value == "WIN")
-=======
 			if(operands[i].value === "WIN")
->>>>>>> ui
 			{
 				result = "WIN";
 				break;
@@ -355,21 +212,12 @@ const boolean_operations = (code, operands, line_number) =>
 	{
 		let op1 = operands.shift();
 		let op2 = operands.shift();
-<<<<<<< HEAD
-		op1 = (op1.value == "WIN")
-		op2 = (op2.value == "WIN")
-
-		if (code == "BOTH OF") result = (op1 && op2);
-		else if (code == "EITHER OF") result = (op1 || op2);
-		else result = (op1 != op2);
-=======
 		op1 = (op1.value === "WIN")
 		op2 = (op2.value === "WIN")
 
 		if (code === "BOTH OF") result = (op1 && op2);
 		else if (code === "EITHER OF") result = (op1 || op2);
 		else result = (op1 !== op2);
->>>>>>> ui
 
 		result = result ? "WIN" : "FAIL";
 	}
@@ -377,26 +225,15 @@ const boolean_operations = (code, operands, line_number) =>
 }
 
 
-<<<<<<< HEAD
-const comparison_operations = (code, operands, line_number, symbol_table) =>
-=======
 const comparison_operations = (code, operands, line_number) =>
->>>>>>> ui
 {
 	let result;
 	const op1 = operands.shift();
 	const op2 = operands.shift();
-<<<<<<< HEAD
-	result = (op1.type == op2.type); // checks if op1 & op2 has same data types
-	if (result) result = (op1.value == op2.value);
-	// checks if true, if yes, checks if their value is equal and assigns it to result
-	if (code == "DIFFRINT") result = !result;
-=======
 	result = (op1.type === op2.type); // checks if op1 & op2 has same data types
 	if (result) result = (op1.value === op2.value);
 	// checks if true, if yes, checks if their value is equal and assigns it to result
 	if (code === "DIFFRINT") result = !result;
->>>>>>> ui
 	// checks if operation is different, if yes, negates result since all comparisons done is equality
 	//conversion of boolean value to TROOF value
 	if (result) result = "WIN"; // checks if result is true
@@ -404,44 +241,6 @@ const comparison_operations = (code, operands, line_number) =>
 
 	return [result, "TROOF"];
 }
-<<<<<<< HEAD
-
-
-const assignment_operation = (code, symbol_table, lexicon, line_number) =>
-{
-	var i = 0;
-	for (i; i<lexicon.length; i++)
-	{
-		if (lexicon[i].name == code.value)
-		{
-			let value;
-			let type;
-			let cur_code = symbol_table.shift();
-			error = recursive_operations(cur_code, symbol_table, lexicon, line_number);
-			if(!Array.isArray(error)) return error;
-			[value, type] = error;
-			lexicon[i].value = value;
-			lexicon[i].type = type;
-			return false;
-		}
-	}
-	if (i == lexicon.length) return `Error on line ${line_number}: assigning value to an undeclared variable ${code.value}`;
-}
-
-const ask_input = (symbol_table, lexicon, line_number) => 
-{
-	let variable = symbol_table.shift();
-	var prompt = require('prompt-sync')();
-	let i = 0;
-	for(;i<lexicon.length; i++) if (lexicon[i].name == variable.value) break;
-
-	if(i == lexicon.length) return `Error in line ${line_number}: GIMME is trying to assign to an undeclared variable`;
-	lexicon[i].value = prompt("", "");
-	lexicon[i].type = "YARN";
-	return false;
-}
-
-=======
 // if main lex == [], assignemnt is done on main
 // else assignemnt is done on flow-control statements and lexicon is FCS lexicon
 const assignment_operation = (code, symbol_table, lexicon, func_table,line_number,handlePrefixChanges) =>
@@ -585,7 +384,6 @@ const truncate = (yarn) =>
 }
 
 
->>>>>>> ui
 /* NOTES OF SPECIAL CHARACTERS
 :) -> newline (\n)
 :> -> tab (\t)
@@ -594,28 +392,13 @@ const truncate = (yarn) =>
 :: -> colon (:)
 :{var} -> typecasts value of var into string and adds to the string
 */
-<<<<<<< HEAD
-const output = (symbol_table,lexicon,line_number) =>
-=======
 const output = (symbol_table,lexicon, func_table,line_number, handlePrefixChanges) =>
->>>>>>> ui
 {
 	let code = symbol_table.shift();
 	let error;
 	let value;
 	let type;
 	let to_print = "";
-<<<<<<< HEAD
-	while(code.value != "\n" && code.value != ",")
-	{
-		switch(code.description)
-		{
-			case "NUMBAR Literal":
-			case "NUMBR Literal":
-			case "TROOF Literal": to_print += code.value;
-				break;
-			case "YARN Literal": to_print += code.value.replace(/"/g,'');
-=======
 	let has_newline = true;
 	while(code.value !== "\n" && code.value !== ",")
 	{
@@ -629,52 +412,20 @@ const output = (symbol_table,lexicon, func_table,line_number, handlePrefixChange
 			case "TROOF Literal": to_print += code.value;
 				break;
 			case "YARN Literal": to_print += code.value.slice(1,-1);
->>>>>>> ui
 				break;
 			case "Identifier":
 				let i = 0;
 				for (i; i<lexicon.length;i++)
 				{
-<<<<<<< HEAD
-					if (lexicon[i].name == code.value)
-					{
-						if(lexicon[i].value == undefined) return `Error in line ${line_number}: trying to print uninitialized variable ${code.value}`
-						else if(lexicon[i].type == "NUMBR") to_print += lexicon[i].value.toString();
-						else if(lexicon[i].type == "NUMBAR")
-						{
-							if(Number.isInteger(lexicon[i].value)) to_print += lexicon[i].value.toFixed(1).toString();
-							else to_print += lexicon[i].value.toString();
-						}
-=======
 					if (lexicon[i].name === code.value)
 					{
 						if(lexicon[i].value === undefined) return `Error in line ${line_number}: trying to print uninitialized variable ${code.value}`
 						else if(lexicon[i].type === "NUMBR") to_print += lexicon[i].value.toString();
 						else if(lexicon[i].type === "NUMBAR") to_print += truncate(lexicon[i].value);
->>>>>>> ui
 						else to_print += lexicon[i].value;
 						break;
 					}
 				}
-<<<<<<< HEAD
-				if(i==lexicon.length) return `Error in line ${line_number}: variable ${code.value} is undeclared`;
-				break;
-			default:
-				error = recursive_operations(code, symbol_table, lexicon, line_number);
-				if(!Array.isArray(error)) return error;
-				[value, type] = error;
-				if(type == "NUMBR") to_print += value.toString();
-				else if(type == "NUMBAR")
-				{
-					if(Number.isInteger(value)) to_print += value.toFixed(1).toString();
-					else to_print += value.toString();
-				}
-				else to_print += value;
-		}
-
-		code = symbol_table.shift();
-	}
-=======
 				if(i===lexicon.length) return `Error in line ${line_number}: variable ${code.value} is undeclared`;
 				break;
 			default:
@@ -693,27 +444,10 @@ const output = (symbol_table,lexicon, func_table,line_number, handlePrefixChange
 	if(!Array.isArray(error)) return error;
 	to_print = error[0];
 	handlePrefixChanges(to_print);
->>>>>>> ui
 	console.log(to_print);
 	return false;
 }
 
-<<<<<<< HEAD
-
-// a function that handles variable declarations and initializations
-const variable_dec_init = (symbol_table, lexicon,line_number) =>
-{
-	let code = symbol_table.shift(); // pops the first element of the array and gives it to code
-	// value is expected to be a variable identifier
-	const name = code.value;
-	if (name == "IT") return `Error in line ${line_number}: IT is an implicit variable and cannot be redeclared`;
-	let value = undefined
-	let type = "NOOB";
-	code = symbol_table.shift(); // gets next code
-	if (code.value != '\n' && code.value != ",")
-	{// iterates until it encounters a new line
-		error = recursive_operations(code, symbol_table, lexicon,line_number);
-=======
 // a function that handles variable declarations and initializations
 const variable_dec_init = (symbol_table, lexicon, func_table, line_number,handlePrefixChanges) =>
 {
@@ -736,65 +470,11 @@ const variable_dec_init = (symbol_table, lexicon, func_table, line_number,handle
 	if (code.value !== '\n' && code.value !== ",")
 	{// iterates until it encounters a new line
 		error = recursive_operations(code, symbol_table, lexicon, func_table,line_number,handlePrefixChanges);
->>>>>>> ui
 		if(!Array.isArray(error)) return error;
 		[value, type] = error;		
 		code = symbol_table.shift(); // updating of iterator
 	}
 
-<<<<<<< HEAD
-	variable = {name: name, value: value, type:type};
-	lexicon.push(variable);
-	return false;
-}
-
-const typecast_to_NUMBR = (value, type, name, line_number) =>
-{
-	if (operands[i].type == "NOOB") return `Error in line ${line_number}: NOOB value cannot by implicitly typecasted into a NUMBR`;
-	else if (value == undefined) return `Error in line ${line_number}: variable ${name} is uninitialized before use`;
-	else if (type == "TROOF")
-	{
-		value = (operands[i].value == "WIN")? 1 : 0;
-	}
-	else if (type == "NUMBAR") value = Math.floor(value);
-	else
-	{
-		const check = operands[i].value.replace(/"/g, '');
-		if (numbar_regex.test(check) || numbr_regex.test(check))
-		{
-			value = Number(check);
-			value = Math.floor(value);
-		}
-		else return `Error in line ${line_number}: ${operands[i].value} cannot be typecasted into a NUMBR or a NUMBR`;
-	}
-	return value;
-}
-
-const typecast_to_TROOF = (value, type, name, line_number) =>
-{
-	if(type == "TROOF") return value;
-	if (type == "NOOB") return "FAIL";
-	else if(value == undefined) return `Error in line ${line_number}: variable ${name} is uninitialized before use`;
-	else if(type == "NUMBAR" || type == "NUMBR") return ((value != 0)? "WIN": "FAIL");
-	else
-	{
-		value = value.replace(/"/g, "");
-		if(value == "WIN") return "WIN";
-		else if (value == "FAIL") return "FAIL";
-		else if(numbr_regex.test(value) || numbar_regex.test(value)) return ((Number(value) != 0)? "WIN": "FAIL");
-		else return ((value != "")? "WIN": "FAIL");
-	}
-} 
-
-const skip_control = (symbol_table, line_number) =>
-{
-	let code = symbol_table.shift();
-	while(code.value != "OIC")
-	{
-		if(code.value == "\n") line_number++;
-		else if(code.value == "O RLY") line_number = skip_control(symbol_table, line_number);
-		else if(code.value == "WTF") line_number = skip_control(symbol_table, line_number);
-=======
 	if(i === lexicon.length)
 	{
 		let variable = {name: name, value: value, type:type};
@@ -885,25 +565,12 @@ const skip_control = (symbol_table, line_number) =>
 		if(code.value === "\n") line_number++;
 		else if(code.value === "O RLY") line_number = skip_control(symbol_table, line_number);
 		else if(code.value === "WTF") line_number = skip_control(symbol_table, line_number);
->>>>>>> ui
 		code = symbol_table.shift();
 	}
 
 	return line_number;
 }
 
-<<<<<<< HEAD
-const if_else_control = (symbol_table, lexicon, line_number) =>
-{
-	let finished = false;
-	let checker = {value:lexicon[0].value, type:lexicon[0].type};
-	checker.value = typecast_to_TROOF(checker.value, checker.type);
-	checker.type = "TROOF";
-	let vars = [];
-	let found = (checker.value == "WIN");
-	let code = symbol_table.shift();
-	while(code.value != "OIC")
-=======
 // return [line_number, found_break] or error prompt
 const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_loop,handlePrefixChanges) =>
 {
@@ -916,25 +583,10 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 	let code = symbol_table.shift();
 	let prev_func = func_table.length;
 	while(code.value !== "OIC")
->>>>>>> ui
 	{
 		if(found) break;
 		switch(code.description)
 		{
-<<<<<<< HEAD
-			case 'If-Else Delimiter Keyword': line_number = skip_control(symbol_table,line_number);
-				break;
-			case 'Line Break': line_number++;
-				break;
-			case 'Else-If Keyword':
-				error = recursive_operations(code, symbol_table, lexicon, line_number);
-				if(!Array.isArray(error)) return error;
-				[checker.value, checker.type] = error;
-				line_number++;
-				checker.value = typecast_to_TROOF(checker.value, checker.type);
-				checker.type = "TROOF";
-				found = (checker.value == "WIN");
-=======
 			case 'Switch Case Delimiter Keyword':
 			case 'If-Else Delimiter Keyword': line_number = skip_control(symbol_table,line_number);
 				break;
@@ -953,23 +605,12 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 				if(!Array.isArray(error)) return error;
 				[checker.value, checker.type] = error;
 				found = (checker.value === "WIN");
->>>>>>> ui
 				break;
 			case 'Else Keyword': found = true;
 		}
 		code = symbol_table.shift();
 	}
 
-<<<<<<< HEAD
-	let to_continue = found;
-	while(to_continue && code.value != "OIC")
-	{
-		switch(code.description)
-		{
-			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, line_number);
-				if(!Number.isInteger(error)) return error;
-				line_number = error;
-=======
 	let found_break = false;
 	let to_continue = found;
 	while(to_continue && code.value !== "OIC")
@@ -980,7 +621,6 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 				if(!Array.isArray(error)) return error;
 				[line_number,found_break] = error;
 				if(found_break) to_continue = false;
->>>>>>> ui
 				break;
 			case 'Line Break': line_number++;
 			case 'If Keyword':
@@ -989,9 +629,6 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 			case 'Else-If Keyword': 
 			case 'Else Keyword': to_continue = false;
 				break;
-<<<<<<< HEAD
-			case 'Switch Case Delimiter Keyword': error = switch_control(symbol_table, lexicon, line_number);
-=======
 			case 'Function Delimeter Keyword':
 				error = get_function(symbol_table, lexicon, func_table, line_number);
 				if(error) return error;
@@ -1005,33 +642,10 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 				found_break = true;
 				break; 
 			case 'Switch Case Delimiter Keyword': error = switch_control(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
->>>>>>> ui
 				if(!Number.isInteger(error)) return error;
 				line_number = error;
 				break;
 			case 'Variable Declaration Keyword': 
-<<<<<<< HEAD
-				error = variable_dec_init(symbol_table, lexicon,line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'Identifier': assignment_operation(code, symbol_table, lexicon, line_number);
-				line_number++;
-				break;
-			case 'Output Keyword':
-				error = output(symbol_table,lexicon,line_number);
-				if(error) return error;
-				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon, line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			default: error = recursive_operations(code, symbol_table, lexicon, line_number);
-				if(!Array.isArray(error)) return error;
-				[value, type] = error;
-				lexicon[0].value = value;
-				lexicon[0].type = type;
-=======
 				error = variable_dec_init(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
@@ -1050,53 +664,11 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 			default: error = recursive_operations(code, symbol_table, lexicon, func_table,line_number,handlePrefixChanges);
 				if(!Array.isArray(error)) return error;
 				[lexicon[0].value, lexicon[0].type] = error;
->>>>>>> ui
 				line_number++;	
 		}
 		code = symbol_table.shift();
 	}
 
-<<<<<<< HEAD
-	if(code.value != "OIC") line_number = skip_control(symbol_table, line_number);
-	return line_number;
-}
-
-
-const execute_switch = (symbol_table, lexicon, line_number) =>
-{
-	let to_continue = true;
-	let code = symbol_table.shift();
-	while(to_continue && code.value != "OIC")
-	{
-		switch(code.description)
-		{
-			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, line_number);
-				if(!Number.isInteger(error)) return error;
-				line_number = error;
-				break;
-			case 'Switch Case Delimiter Keyword': error = switch_control(symbol_table, lexicon,line_number);
-				if(!Number.isInteger(error)) return error;
-				break;
-			case 'Line Break': line_number++;
-			case 'Control Flow Delimiter':
-			case 'Command Line Break': break;
-			case 'Break Keyword': to_continue = false;
-				break;
-			case 'Variable Declaration Keyword': 
-				error = variable_dec_init(symbol_table, lexicon,line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'Identifier': assignment_operation(code, symbol_table, lexicon, line_number);
-				line_number++;
-				break;
-			case 'Output Keyword':
-				error = output(symbol_table,lexicon,line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon, line_number);
-=======
 	const to_remove = lexicon.length - prev_length;
 	const del_func = func_table.length - prev_func;
 	if(to_remove > 0) lexicon.splice(-to_remove,to_remove);
@@ -1155,49 +727,30 @@ const execute_switch = (symbol_table, lexicon, func_table, line_number,handlePre
 				line_number++;
 				break;
 			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number,handlePrefixChanges);
->>>>>>> ui
 				if(error) return error;
 				line_number++;
 				break;
 			case 'Case-Default Keyword':
 			case 'Case Keyword': code = symbol_table.shift();
 				break;
-<<<<<<< HEAD
-			default: error = recursive_operations(code, symbol_table, lexicon, line_number);
-=======
 			default: error = recursive_operations(code, symbol_table, lexicon, func_table,line_number,handlePrefixChanges);
->>>>>>> ui
 				if(!Array.isArray(error)) return error;
 				[value, type] = error;
 				lexicon[0].value = value;
 				lexicon[0].type = type;
 				line_number++;	
 		}
-<<<<<<< HEAD
-		code = symbol_table.shift();
-=======
->>>>>>> ui
 	}
 
 	return [code.value, line_number];
 }
 
-<<<<<<< HEAD
-const switch_control = (symbol_table, lexicon, line_number) =>
-=======
 // return line number, or error prompt
 const switch_control = (symbol_table, lexicon, func_table, line_number,handlePrefixChanges) =>
->>>>>>> ui
 {
 	const holder = {value:lexicon[0].value, type:lexicon[0].type};
 	let to_break = false;
 	let to_compare;
-<<<<<<< HEAD
-	let error;
-	let code = symbol_table.shift();
-
-	while(code.value != "OIC")
-=======
 	let value;
 	let type;
 	let error;
@@ -1206,7 +759,6 @@ const switch_control = (symbol_table, lexicon, func_table, line_number,handlePre
 	let code = symbol_table.shift();
 
 	while(code.value !== "OIC")
->>>>>>> ui
 	{
 		switch(code.description)
 		{
@@ -1216,15 +768,6 @@ const switch_control = (symbol_table, lexicon, func_table, line_number,handlePre
 			case 'Switch Case Delimiter Keyword':
 			case 'If-Else Delimiter Keyword': line_number = skip_control(symbol_table, line_number);
 				break;
-<<<<<<< HEAD
-			case 'Case Keyword': error = recursive_operations(code, symbol_table,lexicon,line_number);
-				if(!Array.isArray(error)) return error;
-				[value, type] = error;
-				to_compare = {value:value, type:type};
-				if(holder.type == to_compare.type && holder.value == to_compare.value)
-				{
-					error = execute_switch(symbol_table, lexicon, line_number);
-=======
 			case 'Loop Delimiter Keyword': error = skip_loop(symbol_table,line_number,0);
 				line_number = error[1];
 				symbol_table.splice(0,error[0]+1);
@@ -1237,18 +780,13 @@ const switch_control = (symbol_table, lexicon, func_table, line_number,handlePre
 				if((holder.type === to_compare.type) && (holder.value === to_compare.value))
 				{
 					error = execute_switch(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
->>>>>>> ui
 					if(!Array.isArray(error)) return error;
 					line_number = error[1];
 					to_break = true;
 				}
 				break;
-<<<<<<< HEAD
-			case 'Case-Default Keyword': error = execute_switch(symbol_table, lexicon, line_number);
-=======
 			case 'Case-Default Keyword':
 				error = execute_switch(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
->>>>>>> ui
 				if(!Array.isArray(error)) return error;
 				line_number = error[1];
 				to_break = true;
@@ -1257,15 +795,6 @@ const switch_control = (symbol_table, lexicon, func_table, line_number,handlePre
 		if(to_break) break;
 		code = symbol_table.shift();
 	}
-<<<<<<< HEAD
-	if(error != undefined) code.value = error[0];
-	if(code.value != "OIC") line_number = skip_control(symbol_table, line_number);
-	return line_number;
-}
-
-const program_start = (symbol_table) =>
-{
-=======
 
 	const to_remove = lexicon.length - prev_length;
 	const del_func = func_table.length - prev_func;
@@ -1591,34 +1120,18 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 export const program_start = (symbol_table,handlePrefixChanges) =>
 {
 	if(symbol_table.length === []) return "Cannot evaluate syntactically incorrect code";
->>>>>>> ui
 	removeComments(symbol_table); // removes comments in the symbol table
 	let line_number = 1;
 	let error;
 	let code;
-<<<<<<< HEAD
-	let lexicon = [{name:"IT", value:undefined, type:"NOOB"}];
-	while(symbol_table.length != 0)
-=======
 	let func_table = [];
 	let lexicon = [{name:"IT", value:undefined, type:"NOOB"}];
 	while(symbol_table.length !== 0)
->>>>>>> ui
 	{
 		code = symbol_table.shift();
 		switch (code.description)
 		{
 			case 'Line Break': line_number++;
-<<<<<<< HEAD
-				break;
-			case 'Command Line Break': break;
-			case 'Variable Declaration Keyword': 
-				error = variable_dec_init(symbol_table, lexicon,line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'Identifier': error = assignment_operation(code, symbol_table, lexicon, line_number);
-=======
 			case 'Command Line Break': break;
 			case 'Function Delimeter Keyword':
 				error = get_function(symbol_table, lexicon, func_table, line_number);
@@ -1637,35 +1150,10 @@ export const program_start = (symbol_table,handlePrefixChanges) =>
 					break;
 				}
 				error = assignment_operation(code, symbol_table, lexicon, func_table, line_number,handlePrefixChanges);
->>>>>>> ui
 				if(error) return error;
 				line_number++;
 				break;
 			case 'Output Keyword':
-<<<<<<< HEAD
-				error = output(symbol_table,lexicon,line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon, line_number);
-				if(error) return error;
-				line_number++;
-				break;
-			case 'If Keyword':
-			case 'Else-IF Keyword':
-			case 'Else Keyword':
-			case 'Flow-Control Delimiter Keyword':
-			case 'Code Delimiter Keyword': break;
-			case 'Switch Case Delimiter Keyword': error = switch_control(symbol_table, lexicon, line_number);
-				if(!Number.isInteger(error)) return error;
-				line_number = error;
-				break;
-			case 'If-Else Delimiter Keyword': error = if_else_control(symbol_table, lexicon, line_number);
-				if(!Number.isInteger(error)) return error;
-				line_number = error;
-				break;
-			default: error = recursive_operations(code, symbol_table, lexicon, line_number);
-=======
 				error = output(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
@@ -1688,7 +1176,6 @@ export const program_start = (symbol_table,handlePrefixChanges) =>
 				line_number = error[0];
 				break;
 			default: error = recursive_operations(code, symbol_table, lexicon, func_table, line_number,handlePrefixChanges);
->>>>>>> ui
 				if(!Array.isArray(error)) return error;
 				[lexicon[0].value, lexicon[0].type] = error;
 				line_number++;
@@ -1697,29 +1184,9 @@ export const program_start = (symbol_table,handlePrefixChanges) =>
 
 	for(let i = 0; i < lexicon.length; i++)
 	{
-<<<<<<< HEAD
-		if (lexicon[i].type == "NUMBAR" && Number.isInteger(lexicon[i].value)) lexicon[i].value = parseFloat(lexicon[i].value.toFixed(1));
-	}
-
-	return lexicon
-}
-
-fs.readFile('./testcases/ifelse.lol', 'utf8', function(err, data){ 
-    if(err) throw err;
-    let error = syntax.parser(data,[],1);
-    // console.log(error);
-    if(!Array.isArray(error)) console.log(error);
-    else
-    {
-    	let symbol_table = error[1];
-    	console.log(program_start(symbol_table));	
-    }
-}); 
-=======
 		if (lexicon[i].type === "NUMBAR" && lexicon[i].value !== undefined) lexicon[i].value = truncate(lexicon[i].value);
 		else if(lexicon[i].value === undefined) lexicon[i].value = "NOOB";
 	}
 
 	return lexicon
 }
->>>>>>> ui
