@@ -29,7 +29,7 @@ export const SecondFrame = ({ parsedLol }) => {
             {
                 (parsedLol.length === 0)?(
                     <div className = "secondFrameCont">
-                        <Empty description={"We Have Nothing to Work On UwU"} style={{color:"white"}}/>
+                        <Empty description={"We Have Nothing to Work On UwU"} style={{color:"white",width:'100%',justifyContent:'center',alignItems:'center',display:'flex',flexDirection:'column'}}/>
                     </div> 
                 ):(
                     <Table className ="secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>

@@ -26,7 +26,7 @@ export const ThirdFrame = ({ symbolTable }) => {
             {
                 (symbolTable.length === 0)?(
                     <div className = "thirdFrameCont">
-                        <Empty description={"We Have Nothing to Work On UwU"} style={{color:"white"}}/>
+                        <Empty description={"We Have Nothing to Work On UwU"} style={{color:"white",width:'100%',justifyContent:'center',alignItems:'center',display:'flex',flexDirection:'column'}}/>
                     </div>
                 ):(
                     <Table className ="thirdFrameContent" dataSource = {symbolTable} columns = {columns} width = {100} pagination = {false}/>
