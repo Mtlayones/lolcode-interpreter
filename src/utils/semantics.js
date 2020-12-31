@@ -1020,7 +1020,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 	const placeholder = i+1;
 	let table = symbol_table.slice(0,i+1);
 	for(i = 0; i<lexicon.length; i++) if(lexicon[i].name === loop_var) break;
-	if(i === lexicon.length) return `Error variable not found ayusin mo to pauwu in loop`;
+	if(i === lexicon.length) return `Error in line ${cur_line_num}: variable ${loop_var} is uninitialized`;
 	loop_var = i;
 
 	let value;
@@ -1063,7 +1063,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 				cur_line_num++;
 				break;
 			case 'Identifier': 
-				assignment_operation(loop_copy, lexicon, func_table, cur_line_num,handlePrefixChanges);
+				assignment_operation(code, loop_copy, lexicon, func_table, cur_line_num,handlePrefixChanges);
 				cur_line_num++;
 				break;
 			case 'Output Keyword':
