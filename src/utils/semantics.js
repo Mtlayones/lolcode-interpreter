@@ -816,19 +816,6 @@ const skip_loop = (symbol_table, line_number,index) =>
 	return [index, line_number];
 }
 
-const skip_func = (code_list, symbol_table,line_number) =>
-{
-	let code = symbol_table.shift();
-	while(code.value !== "IF U SAY SO")
-	{
-		code_list.push(code);
-		if(code.value === "\n") line_number++;
-		code = symbol_table.shift();
-	}
-	code_list.push(code);
-	return line_number
-}
-
 const get_function = (symbol_table, lexicon, func_table, line_number) =>
 {
 	let code_list = [];
