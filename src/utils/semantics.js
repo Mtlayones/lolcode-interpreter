@@ -2,16 +2,16 @@
 /* eslint-disable no-fallthrough */
 /* eslint-disable default-case */
 // const fs = require('fs');
-const { useEffect } = require('react');
 // const syntax = require('./parser.js')
-const numbar_regex = /^(-?\d*.?\d+)$/g
-const numbr_regex = /^(-?\d+)$/g
+import { literal } from './lexemes';
+// const literal['NUMBAR'][0] = /^(-?\d*.?\d+)$/g
+// const literal['NUMBR'][0] = /^(-?\d+)$/g
 // javascript has to float, they use number instead of
 // integers and float
 
 // a function that removes the comments and
 // comment keyword identifiers in the symbol table
-const removeComments = (symbol_table) =>
+export const removeComments = (symbol_table) =>
 {
 	for (var i = 0; i<symbol_table.length; i++)
 	{
@@ -135,12 +135,12 @@ const arithmetic_operations = (code, operands, line_number) =>
 		else if (operands[i].type === "YARN")
 		{
 			const check = operands[i].value;
-			if (numbar_regex.test(check))
+			if (literal['NUMBAR'][0].test(check))
 			{
 				operands[i].value = Number(check);
 				operands[i].type = "NUMBAR";
 			}
-			else if (numbr_regex.test(check))
+			else if (literal['NUMBR'][0].test(check))
 			{
 				operands[i].value = Number(check);
 				operands[i].type = "NUMBR";
@@ -303,12 +303,12 @@ const ask_input = (symbol_table, lexicon, line_number) =>
 	let variable = symbol_table.shift();
 	let input = prompt("");
 	let type = "YARN";
-	if(numbr_regex.test(input))
+	if(literal['NUMBR'][0].test(input))
 	{
 		input = Number(input);
 		type = "NUMBR";
 	}
-	else if(numbar_regex.test(input))
+	else if(literal['NUMBAR'][0].test(input))
 	{
 		input = Number(input);
 		type = "NUMBAR";
@@ -519,7 +519,7 @@ const typecast_to_NUMBR = (value, type, name, line_number) =>
 	else if (type === "NUMBAR") value = Math.floor(value);
 	else
 	{
-		if (numbar_regex.test(value) || numbr_regex.test(value))
+		if (literal['NUMBAR'][0].test(value) || literal['NUMBR'][0].test(value))
 		{
 			value = Number(value);
 			value = Math.floor(value);
@@ -537,7 +537,7 @@ const typecast_to_NUMBAR = (value, type, name, line_number) =>
 	else if (type === "YARN")
 	{
 		// const check = value;
-		if (numbar_regex.test(value) || numbr_regex.test(value)) value = Number(value);
+		if (literal['NUMBAR'][0].test(value) || literal['NUMBR'][0].test(value)) value = Number(value);
 		else return `Error in line ${line_number}: ${value} cannot be typecasted into a NUMBAR`;
 	}
 	return [value,"NUMBAR"];	
@@ -553,7 +553,7 @@ const typecast_to_TROOF = (value, type, name, line_number) =>
 	{
 		if(value === "WIN") value =  "WIN";
 		else if (value === "FAIL") value = "FAIL";
-		else if(numbr_regex.test(value) || numbar_regex.test(value)) value = (Number(value) !== 0)? "WIN": "FAIL";
+		else if(literal['NUMBR'][0].test(value) || literal['NUMBAR'][0].test(value)) value = (Number(value) !== 0)? "WIN": "FAIL";
 		else value = (value !== "")? "WIN": "FAIL";
 	}
 	return [value,"TROOF"];
@@ -1106,7 +1106,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 
 
 // return lexicon (variable table) or error prompt
-const program_start = (symbol_table,handlePrefixChanges) =>
+export const program_start = (symbol_table,handlePrefixChanges) =>
 {
 	if(symbol_table.length === []) return "Cannot evaluate syntactically incorrect code";
 	removeComments(symbol_table); // removes comments in the symbol table
@@ -1180,7 +1180,6 @@ const program_start = (symbol_table,handlePrefixChanges) =>
 	return lexicon
 }
 
-export { program_start, removeComments };
 // fs.readFile('./testcases/loop.lol', 'utf8', function(err, data){ 
 //     if(err) throw err;
 //     let error = syntax.parser(data,[],1);

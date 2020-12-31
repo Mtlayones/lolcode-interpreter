@@ -2,7 +2,7 @@ import React, { useState,useRef,useEffect} from 'react'
 import { Table, Empty } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 
-function ThirdFrame(props) {
+export const ThirdFrame = (props) => {
     const isInitialMount = useRef(true);
     const [description,setDescription] = useState("Nothing to Show Yet UwU")
 
@@ -61,5 +61,3 @@ function ThirdFrame(props) {
         )
     }
 }
-
-export default ThirdFrame

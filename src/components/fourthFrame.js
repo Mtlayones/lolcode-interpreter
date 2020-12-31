@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
-import '../App.css';
+import '../main/App.css';
 
-function FourthFrame(props) {
+export const FourthFrame = (props) => {
 
   const handleOnClick = (event) => {
     // props.setParsedLol([])
@@ -16,8 +16,7 @@ function FourthFrame(props) {
 
   return(
     <div className="fourthFrame">
-        <Button className="executeButton" shape = {'round'} onClick = {handleOnClick}> Execute </Button>
+        <Button className="executeButton" onClick = {handleOnClick}> Execute </Button>
     </div>
   )
 }
-export default FourthFrame

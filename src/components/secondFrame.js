@@ -2,7 +2,7 @@ import React, { useState,useEffect, useRef } from 'react';
 import { Table, Empty } from 'antd'
 import { CloseOutlined } from '@ant-design/icons'
 
-function SecondFrame(props){
+export const SecondFrame = (props) => {
     // Will be used to check if its the first time the app will be mounted. This will not trigger a render when changed
     const isInitialMount = useRef(true)
     // This will be the filtered parsed lol code to display in this frame and is different from the single source of truth
@@ -71,5 +71,3 @@ function SecondFrame(props){
     }
     
 }
-
-export default SecondFrame

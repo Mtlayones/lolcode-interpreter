@@ -1,14 +1,10 @@
 import './App.css';
-import React, {useState} from 'react';
-import FirstFrame from './gui components/firstFrame';
-import SecondFrame from './gui components/secondFrame';
-import program_abs from './gui components/parser';
-import FourthFrame from './gui components/fourthFrame';
-import FifthFrame from './gui components/fifthFrame';
-import ThirdFrame from './gui components/thirdFrame'
-import program_start from './gui components/semantics';
+import React, { useState } from 'react';
+import { FirstFrame, SecondFrame, ThirdFrame, FourthFrame, FifthFrame } from '../components';
+import { program_abs } from '../utils/parser';
+import { program_start } from '../utils/semantics';
 
-function App() {
+const App = () => {
   // lolText contains the text data only
   const [lolText,setLolText] = useState('')
   // lolParser will contain the parsed data
@@ -17,9 +13,6 @@ function App() {
   const [symbolTable, setSymbolTable] = useState([])
   // If a Button is clicked
   const [buttonClickCount, setButtonClickCount] = useState(0)
-
-  
-
 
   return (
     <div className="App">

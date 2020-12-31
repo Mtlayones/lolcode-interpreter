@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import TextArea from 'antd/lib/input/TextArea'
 
-function FifthFrame(props) {
+export const FifthFrame = (props) => {
     // This will keep track of the output key words i.e VISIBLE
     // used to check if first time getting mounted
     const isInitialMountFifthFrame = useRef(true)
@@ -46,5 +46,3 @@ function FifthFrame(props) {
         </div>
     )
 }
-
-export default FifthFrame
