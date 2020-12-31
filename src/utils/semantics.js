@@ -1,11 +1,4 @@
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-fallthrough */
-/* eslint-disable default-case */
-// const fs = require('fs');
-// const syntax = require('./parser.js')
 import { literal } from './lexemes';
-// const literal['NUMBAR'][0] = /^(-?\d*.?\d+)$/g
-// const literal['NUMBR'][0] = /^(-?\d+)$/g
 // javascript has to float, they use number instead of
 // integers and float
 
@@ -1179,16 +1172,3 @@ export const program_start = (symbol_table,handlePrefixChanges) =>
 
 	return lexicon
 }
-
-// fs.readFile('./testcases/loop.lol', 'utf8', function(err, data){ 
-//     if(err) throw err;
-//     let error = syntax.parser(data,[],1);
-//     if(!Array.isArray(error)) console.log(error);
-//     else
-//     {
-// 		// removeComments(error[1]);
-// 		// console.log(error[1]);
-//     	let symbol_table = error[1];
-//     	console.log(program_start(symbol_table));	
-//     }
-// }); 
