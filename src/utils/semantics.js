@@ -41,6 +41,7 @@ const recursive_operations = (code,symbol_table, lexicon, func_table, line_numbe
 	{
 		type = code.description.split(" ")[0];
 		if(type === "NUMBAR" || type === "NUMBR") value = Number(code.value);
+		else if (type === "YARN") value = code.value.slice(1,-1);
 		else value = code.value;
 		return [value, type];
 	}
@@ -294,10 +295,12 @@ const SMOOSH = (operands, line_number) =>
 }
 
 
-const ask_input = (symbol_table, lexicon, line_number) => 
+const ask_input = (symbol_table, lexicon, line_number,handlePrefixChanges) => 
 {
 	let variable = symbol_table.shift();
-	let input = prompt("");
+	let input = prompt(`GIMMEH ${variable.value}`);
+	const str = `Your input is ${input}\n`;
+	handlePrefixChanges(str);
 	let type = "YARN";
 	if(literal['NUMBR'][0].test(input))
 	{
@@ -656,7 +659,7 @@ const if_else_control = (symbol_table, lexicon, func_table, line_number, switch_
 				error = output(symbol_table, lexicon, func_table ,line_number,handlePrefixChanges);
 				if(error) return error;
 				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number);
+			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
 				break;
@@ -725,7 +728,7 @@ const execute_switch = (symbol_table, lexicon, func_table, line_number,handlePre
 				if(error) return error;
 				line_number++;
 				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number);
+			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
 				break;
@@ -950,7 +953,7 @@ const eval_function = (operands, lexicon, func_table, line_number,handlePrefixCh
 				if(error) return error;
 				line_number++;
 				break;
-			case 'Input Keyword': error = ask_input(cur_table, lexicon,line_number);
+			case 'Input Keyword': error = ask_input(cur_table, lexicon,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
 				break;
@@ -1017,7 +1020,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 	const placeholder = i+1;
 	let table = symbol_table.slice(0,i+1);
 	for(i = 0; i<lexicon.length; i++) if(lexicon[i].name === loop_var) break;
-	if(i === lexicon.length) return `Error variable not found ayusin mo to pauwu in loop`;
+	if(i === lexicon.length) return `Error in line ${cur_line_num}: variable ${loop_var} is uninitialized`;
 	loop_var = i;
 
 	let value;
@@ -1060,7 +1063,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 				cur_line_num++;
 				break;
 			case 'Identifier': 
-				assignment_operation(loop_copy, lexicon, func_table, cur_line_num,handlePrefixChanges);
+				assignment_operation(code, loop_copy, lexicon, func_table, cur_line_num,handlePrefixChanges);
 				cur_line_num++;
 				break;
 			case 'Output Keyword':
@@ -1068,7 +1071,7 @@ const loop = (symbol_table, lexicon, func_table,line_number,handlePrefixChanges)
 				if(error) return error;
 				cur_line_num++;
 				break;
-			case 'Input Keyword': error = ask_input(loop_copy, lexicon, cur_line_num);
+			case 'Input Keyword': error = ask_input(loop_copy, lexicon, cur_line_num,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
 				break;
@@ -1157,7 +1160,7 @@ export const program_start = (symbol_table,handlePrefixChanges) =>
 				if(error) return error;
 				line_number++;
 				break;
-			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number);
+			case 'Input Keyword': error = ask_input(symbol_table, lexicon,line_number,handlePrefixChanges);
 				if(error) return error;
 				line_number++;
 				break;
