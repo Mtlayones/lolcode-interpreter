@@ -60,6 +60,7 @@
 	background-color: #31393c !important;
 	border: none !important;
 	display: flex;
+	font-weight: bold;
 	width: 99%;
 }
 
@@ -80,6 +81,7 @@
 }
 
 .fifthFrameTerminal {
+	padding: 1% !important;
 	background-color: white;
 	height: 100%;
 	resize: none;

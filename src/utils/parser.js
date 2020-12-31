@@ -124,7 +124,7 @@ const output_abs = (code,tableOfLexemes,lineNumber) => {
         if(tableOfLexemes[tableOfLexemes.length-1].value === "VISIBLE" && (code[0].join(" ").trim().split(" ")[0] === "," ||code[0].join(" ").trim().split(" ")[0] === "BTW" || code[0].length === 0)){
             // missing operands after the VISIBLE KEYWORD
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
-        }else if(code[0].join(" ").trim().split(" ")[0] === "BTW" || code[0].length === 0 || tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break"){
+        }else if(code[0].join(" ").trim().split(" ")[0] === "BTW" || code[0].length === 0 || (tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break")){
             break;
         }else if(code[0].join(" ").trim().split(" ")[0] === "!"){
             // no new line encountered
@@ -389,7 +389,7 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
         if(code[0].length === 0 && ["ANY OF","AN","ALL OF"].includes(tableOfLexemes[tableOfLexemes.length-1].value)){
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
-        if(cnt>=2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break")){
+        if(cnt>=2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || (tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break"))){
             return `Syntax Error in line ${lineNumber}: Expecting MKAY after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
         if(code[0][0] === ""){
@@ -416,7 +416,7 @@ const boolean_many_recurse_abs = (code,tableOfLexemes,lineNumber) => {
             }
             break;
         }else{
-            if(cnt < 2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break")){
+            if(cnt < 2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || (tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break"))){
                 return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
             }
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
@@ -496,7 +496,7 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
             // lacking operand after AN
             return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
         }
-        if(cnt>=2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break")){
+        if(cnt>=2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || (tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break"))){
             break;
         }
         if(code[0][0] === ""){
@@ -523,7 +523,7 @@ const concat_abs = (code,tableOfLexemes,lineNumber) => {
             }
             break;
         }else{
-            if(cnt < 2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break")){
+            if(cnt < 2 && (code[0].length === 0 || code[0].join(" ").trim().split(" ")[0] === "BTW" || (tableOfLexemes.length!==0 && tableOfLexemes[tableOfLexemes.length-1].description === "Command Line Break"))){
                 return `Syntax Error in line ${lineNumber}: Missing Operands after ${tableOfLexemes[tableOfLexemes.length-1].value}.`;
             }
             return `Syntax Error in line ${lineNumber}: Invalid Operation: ${code[0][0]}.`;
