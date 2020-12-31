@@ -978,7 +978,6 @@ const eval_function = (operands, lexicon, func_table, line_number,handlePrefixCh
 	const to_remove = lexicon.length - prev_length;
 	const del_func = func_table.length - prev_func;
 	if(to_remove > 0) lexicon.splice(-to_remove, to_remove);
-	console.log("me is del func",del_func)
 	if(del_func > 0) func_table.splice(-del_func,del_func);
 	return [lexicon[0].value, lexicon[0].type];
 
