@@ -38,6 +38,7 @@ export const SecondFrame = (props) => {
                 props.setParsedLol(test)
             }else if(typeof parsedText == 'string'){
                 setDescription(parsedText)
+                props.setParsedLol([])
             }
         }else{
             isInitialMount.current = false
