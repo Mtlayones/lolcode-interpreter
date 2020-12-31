@@ -4,7 +4,7 @@ import { CloseOutlined } from '@ant-design/icons'
 
 export const ThirdFrame = (props) => {
     const isInitialMount = useRef(true);
-    const [description,setDescription] = useState("Nothing to Show Yet UwU")
+    const [description,setDescription] = useState("We Have Nothing to Work On UwU")
 
     const columns = [
         {
@@ -40,24 +40,22 @@ export const ThirdFrame = (props) => {
 
     console.log("THIRD FRAME HERE")
 
-    if(props.buttonClickCount===0){
-         return(
-            <div className = "thirdFrame">
-                <Empty description={description}/>
-            </div>
-         )   
-    }else if (props.symbolTable.length === 0){
-        return (
-            <div className = "thirdFrame">
-                <CloseOutlined style={{fontSize: "25px"}}/>
-                <p style={{color:"darkred"}}>{description}</p>
-            </div>
-        )
-    }else{
-        return (
-            <div className="thirdFrame">
-                <Table className = "thirdFrameContent" dataSource = {props.symbolTable} columns = {columns} width = {100} pagination = {false}/>
-            </div>
-        )
-    }
+    return(
+        <div className = "thirdFrame">
+            {(props.buttonClickCount === 0)?(
+                <div className = "thirdFrameCont">
+                    <Empty description={description} style={{color:"white"}}/>
+                </div>
+                ): 
+                (props.symbolTable.length === 0)?(
+                    <div className = "thirdFrameCont">
+                            <CloseOutlined style={{fontSize: "25px", color:"white"}}/>
+                            <p style={{color:"white"}}>{description}</p>
+                    </div>  
+                ):(
+                    <Table className ="thirdFrameContent" dataSource = {props.symbolTable} columns = {columns} width = {100} pagination = {false}/>
+                )
+            }
+        </div>
+    )    
 }

@@ -48,7 +48,7 @@ useEffect(() => {
   return (
     <div className="firstFrame">
         <Dragger className="dragBox" {...fileProperty} fileList = {files} showUploadList={false}>
-          Drag Your LOL Code File Here
+          <p style={{color:'white'}}>Drag Your LOL Code File Here</p>
         </Dragger>
         <AceEditor mode={"null"} theme={"github"} width={"100%"} height={"100%"} showPrintMargin={false} placeholder={"BTW Your code goes here"} value = {localLolText} onChange ={(value)=>{setLocalLolText(value)}}/>
     </div>

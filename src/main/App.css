@@ -1,99 +1,137 @@
 .App {
+	font-family: Helvetica;
 	text-align: center;
-	font-family: monospace;
 }
+
 .mainWrapper {
-	width: 100vw;
 	height: 100vh;
-	background-color: black;
+	width: 100vw;
 }
+
 .firstRow {
+	background-color: #fdca40;
 	display: flex;
 	height: 50%;
 }
 
 .firstFrame {
-	width: 40%;
-	height: 100%;
-	background-color: steelblue;
 	display: flex;
 	flex-direction: column;
-	padding: 0.5% 0.5% 0.5% 0.5%;
+	height: 100%;
+	padding: 0.5%;
+	width: 40%;
 }
 
 .secondFrame {
-	width: 30%;
-	height: 100%;
-	background-color: teal;
-	padding: 0.5% 0.5% 0.5% 0.5%;
-	display: flex;
 	align-items: center;
-	justify-content: center;
+	display: flex;
 	flex-direction: column;
+	height: 100%;
+	justify-content: center;
+	padding: 0.5%;
+	width: 30%;
 }
 
 .thirdFrame {
-	width: 30%;
-	height: 100%;
-	background-color: plum;
-	padding: 0.5% 0.5% 0.5% 0.5%;
-	display: flex;
 	align-items: center;
-	justify-content: center;
 	flex-direction: column;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	padding: 0.5%;
+	width: 30%;
 }
 
 .secondRow {
+	background-color: #fdca40;
 	display: flex;
 	height: 5%;
-	background-color: chocolate;
 }
 
 .fourthFrame {
-	width: 100%;
-	display: flex;
 	align-items: center;
+	display: flex;
+	height: 100%;
 	justify-content: center;
+	width: 100%;
 }
 
 .executeButton {
+	background-color: #31393c !important;
+	border: none !important;
+	display: flex;
 	width: 99%;
 }
 
 .thirdRow {
+	align-items: center;
+	background-color: #fdca40;
 	display: flex;
 	height: 45%;
+	justify-content: center;
+	width: 100%;
 }
 
 .fifthFrame {
+	background-color: white;
 	display: flex;
-	background-color: orange;
-	width: 100%;
+	height: 95%;
+	width: 99%;
 }
 
 .fifthFrameTerminal {
-	width: 100%;
+	background-color: white;
 	height: 100%;
-	background-color: black;
+	resize: none;
+	width: 100%;
 }
 
 .dragBox {
-	border-style: dotted;
-	opacity: 50%;
-	width: 100%;
+	background-color: #31393c !important;
+	border-style: none !important;
 	height: 10%;
 	overflow: visible;
+	width: 100%;
 }
 
 .secondFrameContent {
-	width: 100%;
 	height: 100%;
 	overflow: auto;
+	width: 100%;
+}
+
+.secondFrameCont {
 	align-items: center;
+	background-color: #2176ff !important;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
+}
+
+.secondFrameContent thead[class*='ant-table-thead'] th {
+	background-color: #2176ff !important;
+	color: white !important;
 }
 
 .thirdFrameContent {
-	width: 100%;
 	height: 100%;
 	overflow: auto;
+	width: 100%;
+}
+
+.thirdFrameContent thead[class*='ant-table-thead'] th {
+	background-color: #2176ff !important;
+	color: white !important;
+}
+
+.thirdFrameCont {
+	align-items: center;
+	background-color: #2176ff !important;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: center;
+	width: 100%;
 }

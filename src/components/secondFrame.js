@@ -43,31 +43,23 @@ export const SecondFrame = (props) => {
             isInitialMount.current = false
         }
     },[props.lolText])
-    console.log("SECOND FRAME HERE")
-
-
-
-    // If the execute Button has not been pressed yet, display empty, else display the Table
-    if(props.buttonClickCount === 0){
-         return(
-            <div className = "secondFrame">
-                <Empty description={description} />
-            </div>
-         )   
-    }else if (props.parsedLol.length === 0){
-        console.log("HERE at second frame",props.parsedLol)
-        return (
-            <div className = "secondFrame">
-             <CloseOutlined style={{fontSize: "25px"}}/>
-             <p style={{color:"darkred"}}>{description}</p>
-            </div>
-        )
-    }else{
-        return (
-            <div className="secondFrame">
-                <Table className ="secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>
-            </div>
-        )
-    }
     
+    return(
+        <div className = "secondFrame">
+            {(props.buttonClickCount === 0)?(
+                <div className = "secondFrameCont">
+                    <Empty description={description} style={{color:"white"}}/>
+                </div>
+                ): 
+                (props.parsedLol.length === 0)?(
+                    <div className = "secondFrameCont">
+                            <CloseOutlined style={{fontSize: "25px", color:"white"}}/>
+                            <p style={{color:"white"}}>{description}</p>
+                    </div>  
+                ):(
+                    <Table className ="secondFrameContent" dataSource = {filteredLolCode} columns = {columns} width = {100} pagination = {false}/>
+                )
+            }
+        </div>
+    )    
 }

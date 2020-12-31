@@ -33,7 +33,6 @@ const App = () => {
         </div>
         <div className="thirdRow">
             <FifthFrame symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} program_start={program_start} ></FifthFrame>
-
         </div>
       </div>
     </div>

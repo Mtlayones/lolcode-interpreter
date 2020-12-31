@@ -16,7 +16,7 @@ export const FourthFrame = (props) => {
 
   return(
     <div className="fourthFrame">
-        <Button className="executeButton" onClick = {handleOnClick}> Execute </Button>
+        <Button className="executeButton" type="primary" onClick = {handleOnClick}> Execute </Button>
     </div>
   )
 }
