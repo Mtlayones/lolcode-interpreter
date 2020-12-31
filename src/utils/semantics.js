@@ -1,3 +1,6 @@
+/* eslint-disable default-case */
+/* eslint-disable no-fallthrough */
+/* eslint-disable no-useless-escape */
 import { literal } from './lexemes';
 // javascript has to float, they use number instead of
 // integers and float
@@ -813,6 +816,19 @@ const skip_loop = (symbol_table, line_number,index) =>
 	return [index, line_number];
 }
 
+const skip_func = (code_list, symbol_table,line_number) =>
+{
+	let code = symbol_table.shift();
+	while(code.value !== "IF U SAY SO")
+	{
+		code_list.push(code);
+		if(code.value === "\n") line_number++;
+		code = symbol_table.shift();
+	}
+	code_list.push(code);
+	return line_number
+}
+
 const get_function = (symbol_table, lexicon, func_table, line_number) =>
 {
 	let code_list = [];
@@ -835,9 +851,11 @@ const get_function = (symbol_table, lexicon, func_table, line_number) =>
 	{
 		if(code.description === "Function Delimeter Keyword")
 		{
-			error = get_function(symbol_table,lexicon,func_table,line_number);
-			if(error) return error;
-			code = symbol_table.shift();
+			while(code.value !== "IF U SAY SO")
+			{
+				code_list.push(code);
+				code = symbol_table.shift();
+			}
 		}
 		code_list.push(code);
 		code = symbol_table.shift();
@@ -973,6 +991,7 @@ const eval_function = (operands, lexicon, func_table, line_number,handlePrefixCh
 	const to_remove = lexicon.length - prev_length;
 	const del_func = func_table.length - prev_func;
 	if(to_remove > 0) lexicon.splice(-to_remove, to_remove);
+	console.log("me is del func",del_func)
 	if(del_func > 0) func_table.splice(-del_func,del_func);
 	return [lexicon[0].value, lexicon[0].type];
 
