@@ -299,7 +299,8 @@ const ask_input = (symbol_table, lexicon, line_number,handlePrefixChanges) =>
 {
 	let variable = symbol_table.shift();
 	let input = prompt(`GIMMEH ${variable.value}`);
-	const str = `Your input is ${input}\n`;
+	if(input === null) input = "";
+	const str = `${input}\n`;
 	handlePrefixChanges(str);
 	let type = "YARN";
 	if(literal['NUMBR'][0].test(input))
