@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import TextArea from 'antd/lib/input/TextArea'
 
-export const FifthFrame = (props) => {
+export const FifthFrame = ({ lolText, symbolTable, setSymbolTable, parsedLol, setParsedLol, program_start, program_abs, buttonClick, setButtonClick }) => {
     // This will keep track of the output key words i.e VISIBLE
-    // used to check if first time getting mounted
-    const isInitialMountFifthFrame = useRef(true)
     // this is used to keep track of the values of prefixText
     const prefixTextRef = useRef('')
+    const [prefixText,setPrefixText] = useState('');
 
     // Handles the changes for the prefixText
     const handlePrefixChanges = (strings) => {
@@ -15,37 +14,32 @@ export const FifthFrame = (props) => {
     }
 
     useEffect(() => {
-        // Initial Mount
-        if(isInitialMountFifthFrame.current){
-            isInitialMountFifthFrame.current = false
-        }else{
-            console.log("length of props lol",props.parsedLol.length)
-            // clear the terminal
-            prefixTextRef.current = ""
-            if(props.parsedLol.length !== 0){
-                console.log("PARSED LOL IS")
-                // console.log([...props.parsedLol])
-                let copy = [...props.parsedLol]
-                const symbol_table = props.program_start(copy,handlePrefixChanges)
-                // console.log("the symbol table is",symbol_table)
-                if(typeof symbol_table === 'string'){
-                    console.log("THE SYMBOL TABLE RETURNED A STRING")
-                    prefixTextRef.current = symbol_table
+        if(buttonClick){
+            const parsed_table = program_abs(lolText,[],1);
+            if(Array.isArray(parsed_table)){
+                prefixTextRef.current = "";
+                setParsedLol(parsed_table[1]);
+                const symbol_table = program_start([...parsed_table[1]],handlePrefixChanges);
+                if(Array.isArray(symbol_table)){
+                    setSymbolTable(symbol_table);
                 }else{
-                    console.log("CHANGING THE SYMBOL TABLE")
-                    props.setSymbolTable(symbol_table)
+                    prefixTextRef.current = symbol_table;
+                    setParsedLol([]);
+                    setSymbolTable([]);
                 }
             }else{
-                props.setSymbolTable([])
-                prefixTextRef.current = ""
+                prefixTextRef.current = parsed_table;
+                setParsedLol([]);
+                setSymbolTable([]);
             }
+            setPrefixText(prefixTextRef.current);
+            setButtonClick(false);
         }
-    },[props.parsedLol])
+    },[buttonClick])
 
-    console.log("FIFTH FRAME HERE")
     return (
         <div className = "fifthFrame">
-        <TextArea className="fifthFrameTerminal" bordered={false} value={prefixTextRef.current} readOnly></TextArea>
+        <TextArea className="fifthFrameTerminal" bordered={false} value={prefixText} readOnly></TextArea>
         </div>
     )
 }

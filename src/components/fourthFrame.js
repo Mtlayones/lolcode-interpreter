@@ -1,22 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from 'antd';
 import '../main/App.css';
 
-export const FourthFrame = (props) => {
-
-  const handleOnClick = (event) => {
-    // props.setParsedLol([])
-    // props.setSymbolTable([])
-    console.log("BUTTON CLICKED")
-    props.setButtonClickCount(props.buttonClickCount+1)
-    console.log(props.buttonClickCount)
-  }
-
-  console.log("FOURTH FRAME HERE")
-
+export const FourthFrame = ({ setButtonClick }) => {
   return(
     <div className="fourthFrame">
-        <Button className="executeButton" type="primary" onClick = {handleOnClick}> Execute </Button>
+        <Button className="executeButton" type="primary" onClick = {()=>{setButtonClick(true)}}> Execute </Button>
     </div>
   )
 }

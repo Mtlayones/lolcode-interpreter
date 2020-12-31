@@ -12,7 +12,7 @@ const App = () => {
   // for The Symbol Table
   const [symbolTable, setSymbolTable] = useState([])
   // If a Button is clicked
-  const [buttonClickCount, setButtonClickCount] = useState(0)
+  const [buttonClick, setButtonClick] = useState(false)
 
   return (
     <div className="App">
@@ -20,19 +20,16 @@ const App = () => {
       <div className="mainWrapper">
       {/* First Row contains the First Frame and Second Frame (File Browser and Symbol Table) */}
         <div className="firstRow">
-            <FirstFrame lolText={lolText} setLolText={setLolText} buttonClickCount={buttonClickCount} />
-
-            <SecondFrame setParsedLol={setParsedLol} parsedLol={parsedLol} lolText={lolText} program_abs={program_abs} buttonClickCount={buttonClickCount}/>
-
-            <ThirdFrame buttonClickCount={buttonClickCount} symbolTable={symbolTable}></ThirdFrame>
+            <FirstFrame lolText={lolText} setLolText={setLolText}/>
+            <SecondFrame parsedLol={parsedLol}/>
+            <ThirdFrame symbolTable={symbolTable}/>
         </div>
         {/* The Second Row contains the Third Frame (Terminal) */}
-
         <div className="secondRow">
-            <FourthFrame setButtonClickCount={setButtonClickCount} buttonClickCount={buttonClickCount}/>
+            <FourthFrame setButtonClick={setButtonClick}/>
         </div>
         <div className="thirdRow">
-            <FifthFrame symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} program_start={program_start} ></FifthFrame>
+            <FifthFrame lolText={lolText} symbolTable={symbolTable} setSymbolTable={setSymbolTable} parsedLol={parsedLol} setParsedLol={setParsedLol} program_start={program_start} program_abs={program_abs} buttonClick={buttonClick} setButtonClick={setButtonClick}/>
         </div>
       </div>
     </div>

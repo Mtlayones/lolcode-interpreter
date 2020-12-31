@@ -1,14 +1,13 @@
-import React, { useState,useRef,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload } from 'antd';
 import AceEditor from 'react-ace';
 import 'antd/dist/antd.css';
 import '../main/App.css';
 import "ace-builds/src-noconflict/theme-github";
 
-export const FirstFrame = ({ lolText, setLolText,buttonClickCount }) => {
+export const FirstFrame = ({ lolText, setLolText}) => {
   // Dragger is the file uploader above
-  const isInitialMountFirstFrame = useRef(true);
-  const [localLolText,setLocalLolText] = useState(lolText);
+  const [localLolText,setLocalLolText] = useState('');
   const { Dragger } = Upload;
   const [files, setfiles] = useState([]);
   const [fileProperty] = useState(
@@ -38,12 +37,8 @@ const readFile = async(file) => {
 
 // If the button is clicked we set the main lol text which signals the second frame to parse the data
 useEffect(() => {
-  if(isInitialMountFirstFrame.current){
-    isInitialMountFirstFrame.current = false
-  }else{
-    setLolText(localLolText)
-  }
-},[buttonClickCount])
+  setLolText(localLolText)
+},[localLolText])
 
   return (
     <div className="firstFrame">
