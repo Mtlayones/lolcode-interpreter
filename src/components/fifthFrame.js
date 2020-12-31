@@ -35,6 +35,9 @@ export const FifthFrame = (props) => {
                     console.log("CHANGING THE SYMBOL TABLE")
                     props.setSymbolTable(symbol_table)
                 }
+            }else{
+                props.setSymbolTable([])
+                prefixTextRef.current = ""
             }
         }
     },[props.parsedLol])
