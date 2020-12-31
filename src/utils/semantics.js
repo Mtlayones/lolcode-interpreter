@@ -1,3 +1,6 @@
+/* eslint-disable default-case */
+/* eslint-disable no-fallthrough */
+/* eslint-disable no-useless-escape */
 import { literal } from './lexemes';
 // javascript has to float, they use number instead of
 // integers and float
@@ -151,7 +154,11 @@ const arithmetic_operations = (code, operands, line_number) =>
 	if (code === "SUM OF") result = op1.value + op2.value;
 	else if (code === "DIFF OF") result = op1.value - op2.value;
 	else if (code === "PRODUKT OF") result = op1.value * op2.value;
-	else if (code === "QUOSHUNT OF") result = op1.value / op2.value;
+	else if (code === "QUOSHUNT OF")
+	{
+		if(op2.value === 0) return `Error in line ${line_number}: Division by zero is not allowed`;
+		else result = op1.value / op2.value;
+	}
 	else if (code === "MOD OF") result = op1.value % op2.value;
 	else if (code === "BIGGR OF") result = Math.max(op1.value,op2.value);
 	else result = Math.min(op1.value,op2.value);
