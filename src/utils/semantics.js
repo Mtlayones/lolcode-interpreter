@@ -818,15 +818,27 @@ const get_function = (symbol_table, lexicon, func_table, line_number) =>
 	let code_list = [];
 	let code = symbol_table.shift();
 	let name = code.value
+	let error;
 	for(let i = 0; i<lexicon.length; i++)
 	{
 		if(lexicon[i].name === name) return `Error in line ${line_number}: ${name} is already a variable identifier`;
 	}
 	
 	let parameters = [];
-	while(code.value !== "IF U SAY SO")
+	while(code.value !== "\n")
 	{
 		if(code.description === "Parameter Identifier") parameters.push(code.value);
+		code_list.push(code);
+		code = symbol_table.shift();
+	}
+	while(code.value !== "IF U SAY SO")
+	{
+		if(code.description === "Function Delimeter Keyword")
+		{
+			error = get_function(symbol_table,lexicon,func_table,line_number);
+			if(error) return error;
+			code = symbol_table.shift();
+		}
 		code_list.push(code);
 		code = symbol_table.shift();
 	}
