@@ -59,7 +59,6 @@
 .executeButton {
 	background-color: #31393c !important;
 	border: none !important;
-	display: flex;
 	font-weight: bold;
 	width: 99%;
 }
