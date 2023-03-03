@@ -1,7 +1,7 @@
 # LOLCode Interpreter
 
 ### Description
-- This is the repository of the lolcode interpreter which was the final requirement of a certain course subject. This is deployed and can be accessed through this: [LOLCode Interpreter](https://lolcode-by-utotcode.netlify.app/)
+- This is the repository of the lolcode interpreter. Deployed and can be accessed through this: [LOLCode Interpreter](https://lolcode-by-utotcode.netlify.app/)
 
 ### Authors:
 - Mark Adrian Layones
